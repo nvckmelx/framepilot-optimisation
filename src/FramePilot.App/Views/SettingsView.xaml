@@ -1,0 +1,91 @@
+<UserControl x:Class="FramePilot.App.Views.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:l="clr-namespace:FramePilot.App.Localization">
+    <StackPanel>
+        <TextBlock Style="{StaticResource Eyebrow}" Text="{l:T Nav_Settings}" />
+        <TextBlock Style="{StaticResource H1}" Text="{l:T Set_Title}" Margin="0,0,0,20" />
+
+        <Border Style="{StaticResource Card}">
+            <StackPanel>
+                <TextBlock Style="{StaticResource H2}" Text="{l:T Set_Language}" Margin="0,0,0,10" />
+                <WrapPanel>
+                    <RadioButton Style="{StaticResource Segment}" GroupName="lang" Content="Русский" IsChecked="{Binding IsRussian, Mode=TwoWay}" />
+                    <RadioButton Style="{StaticResource Segment}" GroupName="lang" Content="English" IsChecked="{Binding IsEnglish, Mode=TwoWay}" />
+                </WrapPanel>
+            </StackPanel>
+        </Border>
+
+        <Border Style="{StaticResource Card}">
+            <StackPanel>
+                <TextBlock Style="{StaticResource H2}" Text="{l:T Set_PresentMon}" Margin="0,0,0,6" />
+                <TextBlock Style="{StaticResource MutedText}" Text="{l:T Set_PresentMonSub}" Margin="0,0,0,10" />
+                <TextBlock Style="{StaticResource Body}" FontFamily="{StaticResource MonoFont}" Text="{Binding PresentMonStatus}" Margin="0,0,0,12" TextWrapping="Wrap" />
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
+                    <Button Command="{Binding BrowsePresentMonCommand}" Content="{l:T Set_PresentMonBrowse}" />
+                    <Button Command="{Binding ClearPresentMonCommand}" Content="{l:T Set_PresentMonAuto}" />
+                    <Button Style="{StaticResource LinkButton}" Command="{Binding OpenPresentMonSiteCommand}" Content="{l:T Set_PresentMonSite}" />
+                </StackPanel>
+                <CheckBox IsChecked="{Binding ElevatedCapture, Mode=TwoWay}" Content="{l:T Set_Elevated}" />
+                <TextBlock Style="{StaticResource MutedText}" Margin="30,4,0,0" Text="{l:T Set_ElevatedHint}" />
+            </StackPanel>
+        </Border>
+
+        <Border Style="{StaticResource Card}">
+            <StackPanel>
+                <TextBlock Style="{StaticResource H2}" Text="{l:T Set_License}" Margin="0,0,0,6" />
+                <TextBlock Style="{StaticResource Body}" Text="{Binding LicenseStatusText}" Margin="0,0,0,10" />
+                <TextBlock Style="{StaticResource Eyebrow}" Text="{l:T Set_MachineCode}" />
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                    <TextBox IsReadOnly="True" Text="{Binding MachineCode, Mode=OneWay}" Width="300" FontFamily="{StaticResource MonoFont}" />
+                    <Button Command="{Binding CopyMachineCodeCommand}" Content="{l:T Set_Copy}" Margin="10,0,0,0" />
+                </StackPanel>
+                <TextBlock Style="{StaticResource Eyebrow}" Text="{l:T Set_LicenseKey}" />
+                <TextBox Text="{Binding LicenseInput, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" FontFamily="{StaticResource MonoFont}" Margin="0,0,0,12" TextWrapping="Wrap" />
+                <Button HorizontalAlignment="Left" Style="{StaticResource PrimaryButton}" Command="{Binding ActivateCommand}" Content="{l:T Set_Activate}" />
+                <TextBlock Style="{StaticResource MutedText}" Margin="0,12,0,0" Text="{l:T Set_LicenseNote}" />
+            </StackPanel>
+        </Border>
+
+        <Border Style="{StaticResource Card}">
+            <StackPanel>
+                <TextBlock Style="{StaticResource H2}" Text="{l:T Set_Reports}" Margin="0,0,0,6" />
+                <TextBlock Style="{StaticResource MutedText}" Text="{l:T Set_ReportsSub}" Margin="0,0,0,12" />
+                <StackPanel Orientation="Horizontal">
+                    <Button Command="{Binding ExportJsonCommand}" Content="{l:T Set_ExportJson}" />
+                    <Button Command="{Binding ExportHtmlCommand}" Content="{l:T Set_ExportHtml}" />
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <Border Style="{StaticResource Card}">
+            <StackPanel>
+                <TextBlock Style="{StaticResource H2}" Text="{l:T Set_Demo}" Margin="0,0,0,6" />
+                <CheckBox IsChecked="{Binding DemoMode, Mode=TwoWay}" Content="{l:T Set_DemoToggle}" />
+                <TextBlock Style="{StaticResource MutedText}" Margin="30,4,0,0" Text="{l:T Set_DemoHint}" />
+            </StackPanel>
+        </Border>
+
+        <Border Style="{StaticResource Card}">
+            <StackPanel>
+                <TextBlock Style="{StaticResource H2}" Text="{l:T Set_Privacy}" Margin="0,0,0,6" />
+                <TextBlock Style="{StaticResource Body}" Text="{l:T Set_PrivacyText}" Margin="0,0,0,12" />
+                <TextBlock Style="{StaticResource MutedText}" FontFamily="{StaticResource MonoFont}" Text="{Binding DataFolder}" Margin="0,0,0,12" />
+                <StackPanel Orientation="Horizontal">
+                    <Button Command="{Binding OpenDataFolderCommand}" Content="{l:T Set_OpenData}" />
+                    <Button Style="{StaticResource DangerButton}" Command="{Binding DeleteDataCommand}" Content="{l:T Set_DeleteData}" />
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <Border Style="{StaticResource Card}">
+            <StackPanel>
+                <TextBlock Style="{StaticResource H2}" Text="{l:T Set_About}" Margin="0,0,0,6" />
+                <TextBlock Style="{StaticResource Body}">
+                    <Run Text="FramePilot v" /><Run Text="{Binding Version, Mode=OneWay}" />
+                </TextBlock>
+                <TextBlock Style="{StaticResource MutedText}" Text="{l:T Set_AboutText}" Margin="0,6,0,0" />
+            </StackPanel>
+        </Border>
+    </StackPanel>
+</UserControl>

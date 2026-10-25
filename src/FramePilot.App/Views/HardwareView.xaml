@@ -1,0 +1,38 @@
+<UserControl x:Class="FramePilot.App.Views.HardwareView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:l="clr-namespace:FramePilot.App.Localization">
+    <UserControl.Resources>
+        <DataTemplate x:Key="RowTemplate">
+            <Grid Margin="0,0,0,8" ToolTip="{Binding Tooltip}" Background="Transparent">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="260" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Style="{StaticResource MutedText}" Text="{Binding Label}" Margin="0,0,16,0" />
+                <TextBlock Grid.Column="1" Style="{StaticResource Body}" Text="{Binding Value}"
+                           Foreground="{Binding IsAvailable, Converter={StaticResource AvailBrush}}" />
+            </Grid>
+        </DataTemplate>
+    </UserControl.Resources>
+    <StackPanel>
+        <TextBlock Style="{StaticResource Eyebrow}" Text="{l:T Nav_Hardware}" />
+        <TextBlock Style="{StaticResource H1}" Text="{l:T Hw_Title}" Margin="0,0,0,6" />
+        <TextBlock Style="{StaticResource MutedText}" Text="{l:T Hw_Sub}" Margin="0,0,0,24" MaxWidth="760" HorizontalAlignment="Left" />
+        <Border Style="{StaticResource Card}" Visibility="{Binding HasSnapshot, Converter={StaticResource InvBoolVis}}">
+            <TextBlock Style="{StaticResource Body}" Text="{l:T Hw_Empty}" />
+        </Border>
+        <ItemsControl ItemsSource="{Binding Sections}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource H2}" Text="{Binding Title}" Margin="0,0,0,14" />
+                            <ItemsControl ItemsSource="{Binding Rows}" ItemTemplate="{StaticResource RowTemplate}" />
+                        </StackPanel>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </StackPanel>
+</UserControl>

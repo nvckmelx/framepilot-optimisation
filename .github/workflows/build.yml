@@ -1,0 +1,51 @@
+name: app
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+    paths-ignore: ['web/**']
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Restore
+        run: dotnet restore FramePilot.slnx
+      - name: Build
+        run: dotnet build FramePilot.slnx -c Release --no-restore
+      - name: Test
+        run: dotnet test FramePilot.slnx -c Release --no-build --logger "trx;LogFileName=results.trx" --logger "console;verbosity=normal"
+      - name: Publish
+        shell: pwsh
+        run: ./build/publish.ps1 -SkipTests
+      - name: Install Inno Setup
+        run: choco install innosetup -y --no-progress
+      - name: Installer
+        shell: pwsh
+        run: |
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" "/DSourceDir=$PWD\artifacts\FramePilot" "/DOutputDir=$PWD\artifacts" installer\FramePilot.iss
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: FramePilot
+          path: |
+            artifacts/FramePilot
+            artifacts/FramePilot-Setup-x64.exe
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: "**/TestResults/*.trx"
+      - name: GitHub Release (tags v*)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/FramePilot-Setup-x64.exe
+          generate_release_notes: true

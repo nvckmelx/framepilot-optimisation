@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>FramePilot.App</RootNamespace>
+    <AssemblyName>FramePilot</AssemblyName>
+    <ApplicationIcon>Assets\app.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <Product>FramePilot</Product>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FramePilot.Core\FramePilot.Core.csproj" />
+    <ProjectReference Include="..\FramePilot.Diagnostics\FramePilot.Diagnostics.csproj" />
+    <ProjectReference Include="..\FramePilot.Rules\FramePilot.Rules.csproj" />
+    <ProjectReference Include="..\FramePilot.Inventory\FramePilot.Inventory.csproj" />
+    <ProjectReference Include="..\FramePilot.GameAdapters\FramePilot.GameAdapters.csproj" />
+    <ProjectReference Include="..\FramePilot.Telemetry\FramePilot.Telemetry.csproj" />
+    <ProjectReference Include="..\FramePilot.Optimization\FramePilot.Optimization.csproj" />
+    <ProjectReference Include="..\FramePilot.Storage\FramePilot.Storage.csproj" />
+    <ProjectReference Include="..\FramePilot.Reports\FramePilot.Reports.csproj" />
+    <ProjectReference Include="..\FramePilot.Licensing\FramePilot.Licensing.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\logo-wordmark.png" />
+    <Resource Include="Assets\logo-mark.png" />
+    <Resource Include="Assets\app.ico" />
+    <None Include="..\..\THIRD_PARTY_NOTICES.md" Link="THIRD_PARTY_NOTICES.md" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

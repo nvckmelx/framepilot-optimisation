@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>FramePilot.Reports</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FramePilot.Core\FramePilot.Core.csproj" />
+    <ProjectReference Include="..\FramePilot.Diagnostics\FramePilot.Diagnostics.csproj" />
+  </ItemGroup>
+</Project>

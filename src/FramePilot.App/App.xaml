@@ -1,0 +1,20 @@
+<Application x:Class="FramePilot.App.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:c="clr-namespace:FramePilot.App.Controls"
+             ShutdownMode="OnMainWindowClose">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Theme/Theme.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <c:BoolToVisibilityConverter x:Key="BoolVis" />
+            <c:BoolToVisibilityConverter x:Key="InvBoolVis" Invert="True" />
+            <c:NullToVisibilityConverter x:Key="NullVis" />
+            <c:NullToVisibilityConverter x:Key="InvNullVis" Invert="True" />
+            <c:AvailabilityBrushConverter x:Key="AvailBrush" />
+            <c:StatusBrushConverter x:Key="StatusBrush" />
+            <c:CountToVisibilityConverter x:Key="CountVis" />
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

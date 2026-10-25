@@ -1,0 +1,20 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/FramePilot.Core/FramePilot.Core.csproj" />
+    <Project Path="src/FramePilot.Diagnostics/FramePilot.Diagnostics.csproj" />
+    <Project Path="src/FramePilot.Rules/FramePilot.Rules.csproj" />
+    <Project Path="src/FramePilot.Inventory/FramePilot.Inventory.csproj" />
+    <Project Path="src/FramePilot.GameAdapters/FramePilot.GameAdapters.csproj" />
+    <Project Path="src/FramePilot.Telemetry/FramePilot.Telemetry.csproj" />
+    <Project Path="src/FramePilot.Optimization/FramePilot.Optimization.csproj" />
+    <Project Path="src/FramePilot.Storage/FramePilot.Storage.csproj" />
+    <Project Path="src/FramePilot.Reports/FramePilot.Reports.csproj" />
+    <Project Path="src/FramePilot.Licensing/FramePilot.Licensing.csproj" />
+    <Project Path="src/FramePilot.PrivilegedHelper/FramePilot.PrivilegedHelper.csproj" />
+    <Project Path="src/FramePilot.LicenseTool/FramePilot.LicenseTool.csproj" />
+    <Project Path="src/FramePilot.App/FramePilot.App.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/FramePilot.Tests/FramePilot.Tests.csproj" />
+  </Folder>
+</Solution>
