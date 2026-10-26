@@ -22,9 +22,60 @@ public sealed record DiagnosticReport(
     ComparisonResult? Comparison,
     IReadOnlyList<ChangeSummary> Changes,
     IReadOnlyDictionary<string, string> MetricDefinitions,
-    IReadOnlyList<string> Limitations)
+    IReadOnlyList<string> Limitations,
+    FrameSeries? LatestFrames = null)
 {
     public const string CurrentSchema = "framepilot.report/1";
+}
+
+/// <summary>Histogram bin of frame times: [FromMs, ToMs). The last bin is open-ended.</summary>
+public sealed record HistogramBin(double FromMs, double ToMs, int Count);
+
+/// <summary>
+/// Compact frame-time series for charts. Frames are grouped into buckets of <see cref="BucketSize"/> consecutive frames;
+/// each bucket stores its maximum (so spikes stay visible) and mean frame time. The histogram is computed from all frames.
+/// </summary>
+public sealed record FrameSeries(
+    Guid SessionId,
+    int SourceFrameCount,
+    int BucketSize,
+    double DurationMs,
+    IReadOnlyList<double> MaxFrameTimeMs,
+    IReadOnlyList<double> MeanFrameTimeMs,
+    IReadOnlyList<HistogramBin> Histogram)
+{
+    public const int MaxPoints = 1500;
+
+    public static FrameSeries? From(Guid sessionId, IReadOnlyList<FrameSample>? frames)
+    {
+        if (frames is null) return null;
+        var times = frames.Select(f => f.FrameTimeMs).Where(t => double.IsFinite(t) && t > 0).ToList();
+        if (times.Count < 2) return null;
+        var bucket = Math.Max(1, (int)Math.Ceiling(times.Count / (double)MaxPoints));
+        var max = new List<double>();
+        var mean = new List<double>();
+        for (var i = 0; i < times.Count; i += bucket)
+        {
+            var n = Math.Min(bucket, times.Count - i);
+            double m = 0, sum = 0;
+            for (var j = i; j < i + n; j++)
+            {
+                if (times[j] > m) m = times[j];
+                sum += times[j];
+            }
+            max.Add(Math.Round(m, 3));
+            mean.Add(Math.Round(sum / n, 3));
+        }
+        // 0.5 ms bins up to 50 ms, then one open bin.
+        const double width = 0.5, limit = 50;
+        var counts = new int[(int)(limit / width) + 1];
+        foreach (var t in times) counts[Math.Min(counts.Length - 1, (int)(t / width))]++;
+        var bins = counts.Select((c, i) => new HistogramBin(i * width, i == counts.Length - 1 ? double.PositiveInfinity : (i + 1) * width, c))
+            .ToList();
+        // Trim empty tail bins (keep the open bin only if it has frames).
+        while (bins.Count > 1 && bins[^1].Count == 0) bins.RemoveAt(bins.Count - 1);
+        return new FrameSeries(sessionId, times.Count, bucket, times.Sum(), max, mean, bins);
+    }
 }
 
 public static class ReportBuilder
@@ -50,14 +101,16 @@ public static class ReportBuilder
     };
 
     public static DiagnosticReport Build(string appVersion, string language, SystemSnapshot? snapshot, IReadOnlyList<SessionRecord> sessions,
-        IReadOnlyList<Recommendation> recommendations, ComparisonResult? comparison, IReadOnlyList<ChangeRecord> changes)
+        IReadOnlyList<Recommendation> recommendations, ComparisonResult? comparison, IReadOnlyList<ChangeRecord> changes,
+        SessionRecord? latestSession = null, IReadOnlyList<FrameSample>? latestFrames = null)
     {
         var demo = (snapshot?.IsDemo ?? false) || sessions.Any(s => s.IsDemo);
         return new DiagnosticReport(DiagnosticReport.CurrentSchema, DateTimeOffset.Now, appVersion, demo, language, snapshot, sessions,
             recommendations, comparison,
             changes.Select(c => new ChangeSummary(c.Id, c.BatchId, c.ActionId, c.ActionVersion, c.TargetDescription,
                 c.Original.Display, c.Planned.Display, c.State.ToString(), c.UpdatedAt, c.Error)).ToList(),
-            MetricDefinitions, StandardLimitations);
+            MetricDefinitions, StandardLimitations,
+            latestSession is null ? null : FrameSeries.From(latestSession.Id, latestFrames));
     }
 
     public static string ToJson(DiagnosticReport report) => Json.Serialize(report, indented: true);

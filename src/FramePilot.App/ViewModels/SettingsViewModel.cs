@@ -154,7 +154,12 @@ public sealed class SettingsViewModel : ObservableObject, IPage
         var baseline = target.Where(s => s.Group == RunGroup.Baseline).ToList();
         var after = target.Where(s => s.Group == RunGroup.After).ToList();
         var comparison = baseline.Count + after.Count > 0 ? SessionComparer.Compare(baseline, after) : null;
-        var report = ReportBuilder.Build(App.AppVersion, Loc.Instance.Language, W.Snapshot, sessions, W.Recommendations, comparison, App.Store.GetAll());
+        var latest = target.OrderByDescending(s => s.StartedAt).FirstOrDefault();
+        IReadOnlyList<FrameSample>? frames = null;
+        try { frames = latest is null ? null : CaptureService.LoadFrames(latest); }
+        catch (Exception ex) { ErrorReporter.Log("export", ex.Message); }
+        var report = ReportBuilder.Build(App.AppVersion, Loc.Instance.Language, W.Snapshot, sessions, W.Recommendations, comparison, App.Store.GetAll(),
+            latest, frames);
 
         var dlg = new SaveFileDialog
         {
@@ -170,8 +175,6 @@ public sealed class SettingsViewModel : ObservableObject, IPage
             }
             else
             {
-                var latest = target.OrderByDescending(s => s.StartedAt).FirstOrDefault();
-                var frames = latest is null ? null : CaptureService.LoadFrames(latest);
                 File.WriteAllText(dlg.FileName, ReportBuilder.ToHtml(report, frames), new UTF8Encoding(false));
                 Shell.Open(dlg.FileName);
             }

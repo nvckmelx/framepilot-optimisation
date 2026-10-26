@@ -177,6 +177,24 @@ public class ReportTests
     }
 
     [Fact]
+    public void FrameSeries_KeepsSpikes_AndHistogramCountsAllFrames()
+    {
+        var times = Enumerable.Range(0, 6000).Select(i => i == 3001 ? 80.0 : 5.0 + (i % 4) * 0.25).ToArray();
+        var session = Session(GameId.Cs2, RunGroup.Baseline, Frames(times));
+        var report = ReportBuilder.Build("1", "en", null, new[] { session }, Array.Empty<Recommendation>(), null, Array.Empty<ChangeRecord>(),
+            session, Frames(times));
+        var fs = report.LatestFrames!;
+        Assert.Equal(6000, fs.SourceFrameCount);
+        Assert.True(fs.MaxFrameTimeMs.Count <= FrameSeries.MaxPoints);
+        Assert.Contains(80.0, fs.MaxFrameTimeMs);
+        Assert.Equal(6000, fs.Histogram.Sum(b => b.Count));
+        Assert.True(double.IsPositiveInfinity(fs.Histogram[^1].ToMs));
+        var json = ReportBuilder.ToJson(report);
+        Assert.Contains("latestFrames", json);
+        Assert.NotNull(Json.Deserialize<DiagnosticReport>(json)!.LatestFrames);
+    }
+
+    [Fact]
     public void Html_MarksDemoData_AndEscapesContent()
     {
         var snap = Fixtures.Snapshot() with { IsDemo = true };

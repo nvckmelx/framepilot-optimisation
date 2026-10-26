@@ -1,0 +1,119 @@
+@import "tailwindcss";
+
+@theme {
+  --color-charcoal: #101412;
+  --color-panel: #161b18;
+  --color-panel-2: #1d231f;
+  --color-line: #2a322d;
+  --color-paper: #f4f6ef;
+  --color-mist: #9aa39a;
+  --color-moss: #7d877d;
+  --color-volt: #cbff4d;
+  --color-volt-deep: #8fb82a;
+  --color-amber: #ffb547;
+  --color-flare: #ff6b5e;
+  --color-baseline: #a9b4ab;
+
+  --font-sans: "Manrope", "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Cascadia Mono", ui-monospace, monospace;
+
+  --ease-snap: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@layer base {
+  html {
+    background: var(--color-charcoal);
+    color: var(--color-paper);
+    color-scheme: dark;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    font-family: var(--font-sans);
+    min-height: 100dvh;
+  }
+  ::selection {
+    background: var(--color-volt);
+    color: var(--color-charcoal);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-volt);
+    outline-offset: 3px;
+  }
+}
+
+/* Shape language from the FP mark: one chamfered corner instead of uniform rounding. */
+@utility chamfer {
+  clip-path: polygon(0 0, calc(100% - var(--cut, 22px)) 0, 100% var(--cut, 22px), 100% 100%, 0 100%);
+}
+@utility chamfer-sm {
+  --cut: 12px;
+  clip-path: polygon(0 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% 100%, 0 100%);
+}
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+@layer components {
+/* Bento tile surfaces: a lit gradient and a dark blurred core, the depth trick from the reference board. */
+.tile {
+  position: relative;
+  overflow: hidden;
+  background: var(--color-panel);
+  isolation: isolate;
+}
+.tile > .wash {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+}
+.tile > .core {
+  position: absolute;
+  left: 9%;
+  right: 9%;
+  top: 18%;
+  bottom: -8%;
+  border-radius: 90px;
+  filter: blur(56px);
+  z-index: -1;
+}
+.tile::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.14), inset 0 0 0 1px rgb(255 255 255 / 0.05);
+}
+
+.reveal .tile {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.6s ease, transform 0.8s var(--ease-snap);
+}
+.reveal.in .tile {
+  opacity: 1;
+  transform: none;
+}
+
+}
+
+/* Slanted speed stripes from the poster, used once behind the hero trace. */
+.stripes {
+  background-image: repeating-linear-gradient(-12deg, rgb(203 255 77 / 0.06) 0 2px, transparent 2px 46px);
+}
+
+.trace-glow {
+  filter: drop-shadow(0 0 6px rgb(203 255 77 / 0.55));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal .tile {
+    transition: none;
+    opacity: 1;
+    transform: none;
+  }
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
