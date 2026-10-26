@@ -1,5 +1,4 @@
 /* FRAMEPILOT marks — canonical geometry from docs/brand (do not redraw). Colour comes from CSS `color`. */
-import * as React from "react";
 
 const MARK = "M0 0H80V16H16V80H0Z M32 32H80V80H32V64H64V48H32Z";
 const WORD =
