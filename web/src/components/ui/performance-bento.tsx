@@ -15,10 +15,8 @@ import { gameName, tr } from "@/lib/report";
 const VOLT = "#CBFF4D";
 const PAPER = "#F4F6EF";
 const MOSS = "#7D877D";
-const AMBER = "#FFB547";
 const FLARE = "#FF6B5E";
 const BASE = "#A9B4AB";
-const HAIR = "rgba(244,246,239,.12)";
 const MONO = "JetBrains Mono, ui-monospace, monospace";
 
 const WASH = {
