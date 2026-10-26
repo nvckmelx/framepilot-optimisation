@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { PerformanceBento } from "@/components/ui/performance-bento";
-import { FileIcon, LockIcon, PlayIcon } from "@/components/ui/icons";
+import { FileIcon, LockIcon, PlayIcon, XIcon } from "@/components/ui/icons";
 import { useLang } from "@/lib/i18n";
 import { demoReport } from "@/lib/demo";
 import { parseReport, ReportError, type DiagnosticReport } from "@/lib/report";
@@ -29,44 +29,44 @@ export function ReportViewer() {
 
   if (report) {
     return (
-      <main id="main" className="mx-auto max-w-[1320px] px-4 pt-8 pb-16 sm:px-6">
+      <main id="main" className="bg-ink text-paper"><div className="wrap pt-10 pb-20">
         <div className="mb-6 flex flex-wrap items-center gap-x-4 gap-y-3">
-          <h1 className="flex-1 text-[28px] font-bold tracking-[-0.03em]">
+          <h1 className="flex-1 text-[clamp(28px,4vw,40px)]">
             {t.v_title}
-            <span className="mt-1 block text-[14px] font-medium tracking-normal text-moss sm:ml-3 sm:mt-0 sm:inline">
+            <span className="mt-1 block text-[14px] font-normal tracking-normal text-muted-dark sm:ml-3 sm:mt-0 sm:inline">
               {t.v_generated} {new Date(report.generatedAt).toLocaleString(lang === "ru" ? "ru-RU" : "en-US", { dateStyle: "medium", timeStyle: "short" })} · v{report.appVersion}
             </span>
           </h1>
-          <Button variant="ghost" size="sm" onClick={() => { setReport(null); setError(null); }}>{t.v_close}</Button>
+          <Button variant="outline" size="sm" onClick={() => { setReport(null); setError(null); }}>{t.v_close}</Button>
         </div>
-        {report.isDemo && <div className="mb-3 inline-block bg-amber px-3 py-1 text-[12.5px] font-bold text-charcoal chamfer-sm">{t.v_demo_badge}</div>}
+        {report.isDemo && <p className="label mb-4 inline-block rounded-[4px] bg-accent px-3 py-1.5 text-ink">{t.v_demo_badge}</p>}
         <PerformanceBento key={report.generatedAt + report.sessions.length} report={report} />
-      </main>
+      </div></main>
     );
   }
 
   return (
-    <main id="main" className="mx-auto max-w-[880px] px-4 pt-16 pb-24 sm:px-6">
-      <h1 className="text-[36px] font-bold tracking-[-0.03em] sm:text-[44px]">{t.v_title}</h1>
-      <p className="mt-3 text-[16px] leading-[1.6] text-paper/65">{t.v_how}</p>
+    <main id="main" className="wrap max-w-[960px] pt-16 pb-24">
+      <h1 className="text-[clamp(36px,5vw,56px)]">{t.v_title}</h1>
+      <p className="mt-4 text-[18px] leading-[1.6] text-muted-light">{t.v_how}</p>
       <div
         onDragOver={(e) => { e.preventDefault(); setDrag(true); }}
         onDragLeave={() => setDrag(false)}
         onDrop={(e) => { e.preventDefault(); setDrag(false); load(e.dataTransfer.files[0]); }}
-        className={cn("tile chamfer mt-8 grid place-items-center border border-dashed px-6 py-16 text-center transition-colors",
-          drag ? "border-volt bg-volt/8" : "border-white/18 bg-panel")}>
-        <FileIcon width={34} height={34} className="text-volt" />
-        <p className="mt-4 text-[19px] font-semibold">{t.v_drop}</p>
-        <p className="mt-1 text-[14px] text-moss">{t.v_drop_or}</p>
+        className={cn("mt-10 grid place-items-center rounded-[8px] border-2 border-dashed px-6 py-16 text-center transition-colors duration-[180ms]",
+          drag ? "border-ink bg-accent/25" : "border-border-light")}>
+        <FileIcon width={36} height={36} />
+        <p className="mt-4 text-[20px] font-bold">{t.v_drop}</p>
+        <p className="mt-1 text-[15px] text-muted-light">{t.v_drop_or}</p>
         <div className="mt-4 flex flex-wrap justify-center gap-3">
           <Button onClick={() => input.current?.click()}><FileIcon />{t.v_pick}</Button>
-          <Button variant="ghost" onClick={() => setReport(demoReport())}><PlayIcon />{t.v_demo}</Button>
+          <Button variant="outline" onClick={() => setReport(demoReport())}><PlayIcon />{t.v_demo}</Button>
         </div>
         <input ref={input} type="file" accept="application/json,.json" className="sr-only" aria-label={t.v_pick}
           onChange={(e) => { load(e.target.files?.[0]); e.target.value = ""; }} />
       </div>
-      {error && <p role="alert" className="mt-4 border-l-2 border-flare bg-flare/10 px-4 py-3 text-[14.5px]">{error}</p>}
-      <p className="mt-5 flex items-center gap-2 text-[13.5px] text-moss"><LockIcon width={16} height={16} />{t.v_local}</p>
+      {error && <p role="alert" className="mt-5 flex items-start gap-3 rounded-[4px] border-2 border-ink px-4 py-3 text-[16px]"><XIcon className="mt-0.5 shrink-0" width={20} height={20} strokeWidth={2.4} />{error}</p>}
+      <p className="mt-5 flex items-center gap-2 text-[15px] text-muted-light"><LockIcon width={16} height={16} />{t.v_local}</p>
     </main>
   );
 }

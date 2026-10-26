@@ -37,7 +37,7 @@ public sealed class DialogWindow : Window
         };
 
         var root = new StackPanel { Margin = new Thickness(24) };
-        root.Children.Add(new Border { Height = 3, Width = 40, Background = accent, HorizontalAlignment = HorizontalAlignment.Left, Margin = new Thickness(0, 0, 0, 14), CornerRadius = new CornerRadius(2) });
+        root.Children.Add(new Border { Height = 3, Width = 40, Background = accent, HorizontalAlignment = HorizontalAlignment.Left, Margin = new Thickness(0, 0, 0, 14), CornerRadius = new CornerRadius(0) });
         root.Children.Add(new TextBlock { Text = title, Style = (Style)Application.Current.Resources["H2"], Margin = new Thickness(0, 0, 0, 10) });
         root.Children.Add(new TextBlock { Text = message, Style = (Style)Application.Current.Resources["Body"] });
 

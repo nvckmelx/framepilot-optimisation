@@ -17,7 +17,7 @@
                             <Button DockPanel.Dock="Right" VerticalAlignment="Center" Margin="12,0,0,0" Command="{Binding RollbackCommand}"
                                     Content="{l:T History_Rollback}" Visibility="{Binding CanRollback, Converter={StaticResource BoolVis}}" />
                             <StackPanel>
-                                <TextBlock Style="{StaticResource Body}" FontWeight="SemiBold" FontFamily="{StaticResource MonoFont}" Text="{Binding Target}" TextWrapping="Wrap" />
+                                <TextBlock Style="{StaticResource Body}" FontWeight="Bold" FontFamily="{StaticResource MonoFont}" Text="{Binding Target}" TextWrapping="Wrap" />
                                 <TextBlock Style="{StaticResource Body}" Text="{Binding Values}" />
                                 <TextBlock Style="{StaticResource MutedText}">
                                     <Run Text="{Binding StateText, Mode=OneWay}" Foreground="{StaticResource Accent}" /><Run Text=" · " /><Run Text="{Binding When, Mode=OneWay}" /><Run Text=" · " /><Run Text="{Binding Action, Mode=OneWay}" />

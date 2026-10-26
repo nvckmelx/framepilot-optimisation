@@ -4,7 +4,7 @@
         xmlns:vm="clr-namespace:FramePilot.App.ViewModels"
         xmlns:v="clr-namespace:FramePilot.App.Views"
         xmlns:l="clr-namespace:FramePilot.App.Localization"
-        Title="FramePilot" Width="1320" Height="860" MinWidth="1020" MinHeight="640"
+        Title="FRAMEPILOT" Width="1320" Height="860" MinWidth="1020" MinHeight="640"
         WindowStartupLocation="CenterScreen"
         Background="{StaticResource Bg}" Foreground="{StaticResource Text}"
         FontFamily="{StaticResource UiFont}" Icon="Assets/app.ico"
@@ -29,9 +29,9 @@
         <!-- Sidebar -->
         <Border Background="{StaticResource Surface}" BorderBrush="{StaticResource Line}" BorderThickness="0,0,1,0">
             <DockPanel Margin="16,22,16,18">
-                <Image DockPanel.Dock="Top" Source="Assets/logo-wordmark.png" Height="24" HorizontalAlignment="Left"
-                       Margin="8,0,0,28" RenderOptions.BitmapScalingMode="HighQuality"
-                       AutomationProperties.Name="FramePilot" />
+                <Image DockPanel.Dock="Top" Source="Assets/logo-wordmark.png" Height="36" HorizontalAlignment="Left"
+                       Margin="4,0,0,28" RenderOptions.BitmapScalingMode="HighQuality"
+                       AutomationProperties.Name="FRAMEPILOT" />
                 <StackPanel DockPanel.Dock="Bottom" Margin="8,12,0,0">
                     <TextBlock Style="{StaticResource MutedText}" FontSize="12"
                                Text="{Binding Settings.LicenseStatusText}" TextTrimming="CharacterEllipsis" />

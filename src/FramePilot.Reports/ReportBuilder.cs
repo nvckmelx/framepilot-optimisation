@@ -131,15 +131,15 @@ public static class ReportBuilder
             <meta name="viewport" content="width=device-width,initial-scale=1">
             <title>FramePilot — {{T("Диагностический отчёт", "Diagnostic report")}}</title>
             <style>
-            :root{--bg:#101412;--panel:#171c19;--line:#2a312c;--text:#F4F6EF;--muted:#9aa39a;--accent:#CBFF4D;--warn:#ffb547;--bad:#ff6b5e}
-            *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.55 Manrope,"Segoe UI",system-ui,sans-serif}
+            :root{--bg:#101412;--panel:#1B211D;--line:#39413B;--text:#F4F6EF;--muted:#AEB8AE;--accent:#CBFF4D;--warn:#ffb547;--bad:#ff6b5e}
+            *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 Arial,Helvetica,sans-serif}
             main{max-width:1040px;margin:0 auto;padding:32px 20px 64px}h1{font-size:28px;margin:0 0 4px}h2{font-size:18px;margin:36px 0 12px;color:var(--accent);letter-spacing:.04em;text-transform:uppercase}
             .muted{color:var(--muted)}.na{color:var(--muted);border-bottom:1px dotted var(--muted);cursor:help}
-            .demo{background:var(--warn);color:#101412;font-weight:700;padding:10px 14px;border-radius:8px;margin:16px 0}
-            table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+            .demo{background:var(--accent);color:#101412;font-weight:700;padding:10px 14px;border-radius:4px;margin:16px 0}
+            table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden}
             th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}th{color:var(--muted);font-weight:600;width:34%}
-            .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:12px 0}
-            .tag{display:inline-block;font-size:12px;padding:2px 8px;border-radius:99px;border:1px solid var(--line);color:var(--muted);margin-right:6px}
+            .card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:24px;margin:12px 0}
+            .tag{display:inline-block;font-size:12px;padding:2px 8px;border-radius:4px;border:1px solid var(--line);color:var(--muted);margin-right:6px}
             .tag.auto{border-color:var(--accent);color:var(--accent)}svg{width:100%;height:220px;background:var(--panel);border:1px solid var(--line);border-radius:10px}
             code{color:var(--accent)}
             </style></head><body><main>

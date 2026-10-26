@@ -1,7 +1,7 @@
 import * as React from "react";
 import { prefersReducedMotion } from "@/lib/utils";
 
-/* 5×7 dot-matrix glyphs: the readout of an instrument rather than a headline number. */
+/* 5×7 module-matrix glyphs (square cells, echoing the 16-unit module of the Frame F mark). */
 const G: Record<string, string[]> = {
   "0": ["01110", "10001", "10011", "10101", "11001", "10001", "01110"],
   "1": ["00100", "01100", "00100", "00100", "00100", "00100", "01110"],
@@ -42,7 +42,7 @@ export interface DotNumberProps {
 }
 
 /** Counts up to `value` and renders it as lit dots on a faint grid. */
-export function DotNumber({ value, digits = 0, pitch = 7, color = "#F4F6EF", dim = "rgba(244,246,239,.09)", label, className }: DotNumberProps) {
+export function DotNumber({ value, digits = 0, pitch = 7, color = "#CBFF4D", dim = "rgba(244,246,239,.08)", label, className }: DotNumberProps) {
   const [shown, setShown] = React.useState(prefersReducedMotion() ? value : 0);
   const from = React.useRef(shown);
   React.useEffect(() => {
@@ -69,14 +69,14 @@ export function DotNumber({ value, digits = 0, pitch = 7, color = "#F4F6EF", dim
   const { on, cols } = layout(text);
   const total = layout(final).cols;
   const lit = new Set(on.map(([c, r]) => c * 8 + r));
-  const r = pitch * 0.36;
+  const cell = pitch * 0.78;
   const dots: React.ReactNode[] = [];
   for (let c = 0; c < total; c++)
     for (let row = 0; row < 7; row++) {
       const isOn = lit.has(c * 8 + row);
       dots.push(
-        <circle key={c * 8 + row} cx={c * pitch + pitch / 2} cy={row * pitch + pitch / 2} r={isOn ? r : r * 0.62}
-          fill={isOn ? color : c < cols ? dim : "transparent"} />,
+        <rect key={c * 8 + row} x={c * pitch + (pitch - (isOn ? cell : cell * 0.5)) / 2} y={row * pitch + (pitch - (isOn ? cell : cell * 0.5)) / 2}
+          width={isOn ? cell : cell * 0.5} height={isOn ? cell : cell * 0.5} fill={isOn ? color : c < cols ? dim : "transparent"} />,
       );
     }
   return (

@@ -1,0 +1,30 @@
+:root {
+  --fp-ink: #101412;
+  --fp-paper: #F4F6EF;
+  --fp-accent: #CBFF4D;
+  --fp-muted-light: #586258;
+  --fp-muted-dark: #AEB8AE;
+  --fp-surface-dark: #1B211D;
+  --fp-border-light: #D7DDD3;
+  --fp-border-dark: #39413B;
+  --fp-font: Arial, Helvetica, sans-serif;
+  --fp-radius-control: 4px;
+  --fp-radius-card: 8px;
+  --fp-ease: cubic-bezier(.2,.8,.2,1);
+}
+.fp-button {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 12px; min-height: 48px; padding: 12px 20px;
+  background: var(--fp-accent); color: var(--fp-ink);
+  font: 700 16px/1.2 var(--fp-font);
+  border: 1px solid transparent; border-radius: var(--fp-radius-control);
+  cursor: pointer; text-decoration: none;
+  transition: transform 180ms var(--fp-ease);
+}
+.fp-button:hover { transform: translateY(-2px); }
+.fp-button:focus-visible { outline: 3px solid currentColor; outline-offset: 4px; }
+.fp-card { padding: 32px; border: 1px solid var(--fp-border-light); border-radius: var(--fp-radius-card); }
+@media (prefers-reduced-motion: reduce) {
+  .fp-button { transition: none; }
+  .fp-button:hover { transform: none; }
+}

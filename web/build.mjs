@@ -30,7 +30,7 @@ async function buildCss() {
   // Candidate extraction: every class-like token in the sources; Tailwind ignores tokens that are not utilities.
   const candidates = new Set();
   for (const f of walk(src).filter((f) => /\.(tsx?|html)$/.test(f))) {
-    for (const t of fs.readFileSync(f, "utf8").split(/[\s"'`{}()<>,;]+/)) if (t && t.length < 120) candidates.add(t);
+    for (const t of fs.readFileSync(f, "utf8").split(/[\s"'`{}<>;]+/)) if (t && t.length < 120) candidates.add(t);
   }
   const css = compiler.build([...candidates]);
   const min = await esbuild.transform(css, { loader: "css", minify: true });

@@ -17,7 +17,7 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="ListBoxItem">
                         <Border x:Name="Bd" Background="{StaticResource Surface2}" BorderBrush="{StaticResource Line}" BorderThickness="1"
-                                CornerRadius="8" Padding="12,7" Margin="0,0,6,6">
+                                CornerRadius="4" Padding="14,9" Margin="0,0,6,6">
                             <ContentPresenter />
                         </Border>
                         <ControlTemplate.Triggers>
@@ -110,7 +110,7 @@
         <Border Style="{StaticResource Card}" Visibility="{Binding HasComparison, Converter={StaticResource BoolVis}}">
             <StackPanel>
                 <TextBlock Style="{StaticResource H2}" Text="{l:T Sessions_Comparison}" Margin="0,0,0,8" />
-                <TextBlock Style="{StaticResource Body}" FontWeight="SemiBold" Text="{Binding ComparisonSummary}" Margin="0,0,0,10" />
+                <TextBlock Style="{StaticResource Body}" FontWeight="Bold" Text="{Binding ComparisonSummary}" Margin="0,0,0,10" />
                 <ItemsControl ItemsSource="{Binding ComparisonWarnings}" Margin="0,0,0,10">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
@@ -162,7 +162,7 @@
                                                 ToolTip="{l:T Sessions_GroupTip}"
                                                 Command="{Binding DataContext.SetGroupCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
                                                 CommandParameter="{Binding}" />
-                                        <TextBlock Style="{StaticResource Body}" FontWeight="SemiBold" Text="{Binding Title}" />
+                                        <TextBlock Style="{StaticResource Body}" FontWeight="Bold" Text="{Binding Title}" />
                                     </DockPanel>
                                     <TextBlock Style="{StaticResource MutedText}">
                                         <Run Text="{Binding Fps, Mode=OneWay}" /><Run Text=" FPS · P99 " /><Run Text="{Binding P99, Mode=OneWay}" /><Run Text=" ms · 1% low " /><Run Text="{Binding Low1, Mode=OneWay}" /><Run Text=" · " /><Run Text="{Binding Spikes, Mode=OneWay}" />

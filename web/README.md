@@ -27,3 +27,6 @@ One-time setup in hPanel:
 2. Repository: `https://github.com/nvckmelx/framepilot-optimisation.git`, branch `hostinger-site`, install path empty (`public_html` must be empty first).
 3. Create, then **Deploy**.
 4. Optional auto-deploy: copy the webhook URL from the same page and add it in GitHub → Settings → Webhooks (content type `application/json`, push events).
+
+## Brand
+Visual identity follows `docs/brand/FRAMEPILOT_BRAND_MASTER.md` (Frame F / minimal): canonical SVG geometry in `src/components/ui/logo.tsx`, Arial, Ink / Paper / Accent palette, 4 px controls and 8 px cards, 180/280 ms motion with `cubic-bezier(.2,.8,.2,1)`.

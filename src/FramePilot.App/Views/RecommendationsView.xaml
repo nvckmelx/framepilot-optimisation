@@ -79,7 +79,7 @@
         <Border Style="{StaticResource Card}" Visibility="{Binding HasSnapshot, Converter={StaticResource InvBoolVis}}">
             <TextBlock Style="{StaticResource Body}" Text="{l:T Rec_NoSnapshot}" />
         </Border>
-        <Border Background="{StaticResource WarnSoft}" BorderBrush="{StaticResource Warn}" BorderThickness="1" CornerRadius="10" Padding="16,12" Margin="0,0,0,14"
+        <Border Background="{StaticResource WarnSoft}" BorderBrush="{StaticResource Warn}" BorderThickness="1" CornerRadius="8" Padding="16,12" Margin="0,0,0,14"
                 Visibility="{Binding HasSession, Converter={StaticResource InvBoolVis}}">
             <TextBlock Style="{StaticResource Body}" Text="{l:T Rec_NoSession}" />
         </Border>
@@ -93,7 +93,7 @@
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Margin="0,0,0,8">
-                                <TextBlock Style="{StaticResource Body}" FontWeight="SemiBold">
+                                <TextBlock Style="{StaticResource Body}" FontWeight="Bold">
                                     <Run Text="{Binding Title, Mode=OneWay}" /><Run Text=" — " /><Run Text="{Binding Target, Mode=OneWay}" />
                                 </TextBlock>
                                 <TextBlock Style="{StaticResource MutedText}" Text="{Binding Note}" />
@@ -127,7 +127,7 @@
                         <DataTemplate>
                             <Border BorderBrush="{StaticResource Line}" BorderThickness="0,0,0,1" Padding="0,8">
                                 <StackPanel>
-                                    <TextBlock Style="{StaticResource Body}" FontWeight="SemiBold" Text="{Binding Title}" />
+                                    <TextBlock Style="{StaticResource Body}" FontWeight="Bold" Text="{Binding Title}" />
                                     <TextBlock Style="{StaticResource MutedText}" FontFamily="{StaticResource MonoFont}" Text="{Binding Target}" />
                                     <TextBlock Style="{StaticResource Body}">
                                         <Run Text="{Binding Current, Mode=OneWay}" Foreground="{StaticResource Muted}" /><Run Text="  →  " /><Run Text="{Binding Desired, Mode=OneWay}" Foreground="{StaticResource Accent}" />
