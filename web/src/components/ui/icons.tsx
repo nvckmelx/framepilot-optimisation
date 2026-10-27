@@ -1,4 +1,4 @@
-/* Small stroke icons drawn for FramePilot (24×24 grid). */
+/* Small stroke icons for TuneFPS (24×24 grid). */
 import * as React from "react";
 
 type P = React.SVGProps<SVGSVGElement>;

@@ -1,0 +1,202 @@
+{
+  "$schema": "https://design-tokens.github.io/community-group/format/",
+  "$description": "TuneFPS design tokens v1.0 (2026-10-26). Single source of truth: tunefps-tokens.css and wpf/TuneFPS.Theme.xaml are generated from this file by tools/generate.py. Dark theme only; a light theme is not designed yet.",
+  "brand": {
+    "$description": "Core brand palette. Values are final and match the approved logo files.",
+    "midnight": { "$type": "color", "$value": "#1A1C20", "$description": "Main background of brand and app" },
+    "carbon": { "$type": "color", "$value": "#111214", "$description": "Deep background: title bar, sidebar, sunken panels" },
+    "graphite": { "$type": "color", "$value": "#2C3038", "$description": "Lines, dividers, selected nav item" },
+    "white": { "$type": "color", "$value": "#FFFFFF", "$description": "Primary text; 'tune' in the logo" },
+    "steel": { "$type": "color", "$value": "#A3B3C6", "$description": "'fps' in the logo; labels and secondary text on dark only" },
+    "tuneBlue": { "$type": "color", "$value": "#007BFF", "$description": "App icon tile, accents, fills. Not for small text on dark (4.29:1 on midnight)" },
+    "deepBlue": { "$type": "color", "$value": "#0066D6", "$description": "Primary button fill: white text 5.42:1" }
+  },
+  "color": {
+    "bg": {
+      "app": { "$type": "color", "$value": "{brand.midnight}" },
+      "sunken": { "$type": "color", "$value": "{brand.carbon}" },
+      "raised": { "$type": "color", "$value": "#22252B", "$description": "Popovers, menus, hovered rows" },
+      "overlay": { "$type": "color", "$value": "#0B0C0E", "$description": "Behind dialogs (use at 72% opacity)" }
+    },
+    "border": {
+      "subtle": { "$type": "color", "$value": "{brand.graphite}", "$description": "Decorative dividers and card outlines" },
+      "strong": { "$type": "color", "$value": "#3A4049", "$description": "Secondary button outline, dashed add-slots" },
+      "control": { "$type": "color", "$value": "#6E7682", "$description": "Input/checkbox boundaries: 3.72:1 on midnight (WCAG 1.4.11)" }
+    },
+    "text": {
+      "primary": { "$type": "color", "$value": "{brand.white}", "$description": "17.06:1 on midnight" },
+      "secondary": { "$type": "color", "$value": "#C9CFD6", "$description": "10.87:1 on midnight" },
+      "muted": { "$type": "color", "$value": "#9BA3AE", "$description": "6.70:1 on midnight, 5.19:1 on graphite" },
+      "subtle": { "$type": "color", "$value": "#8B939E", "$description": "5.50:1 on midnight. Not on graphite (4.26:1)" },
+      "label": { "$type": "color", "$value": "{brand.steel}", "$description": "Caps labels, 7.98:1 on midnight" },
+      "link": { "$type": "color", "$value": "#4C9DFF", "$description": "Links and accent text on dark: 6.15:1" },
+      "onAccent": { "$type": "color", "$value": "{brand.white}" },
+      "danger": { "$type": "color", "$value": "#F87171", "$description": "Error text on dark: 6.17:1" }
+    },
+    "accent": {
+      "fill": { "$type": "color", "$value": "{brand.tuneBlue}" },
+      "strong": { "$type": "color", "$value": "#4C9DFF", "$description": "Focus ring, chart 'after' line, active indicators" },
+      "soft": { "$type": "color", "$value": "#007BFF29", "$description": "Selected backgrounds (16% blue)" }
+    },
+    "status": {
+      "success": { "$type": "color", "$value": "#22C55E", "$description": "Measured improvement. Always paired with text and a sign (+/−)" },
+      "warning": { "$type": "color", "$value": "#F59E0B", "$description": "Risk notes (anti-cheat, stability). Always with text" },
+      "danger": { "$type": "color", "$value": "#EF4444", "$description": "Fills and icons for errors/regressions; use text.danger for text" },
+      "neutral": { "$type": "color", "$value": "#9BA3AE", "$description": "Result within noise / no significant change" },
+      "successSoft": { "$type": "color", "$value": "#22C55E1F" },
+      "warningSoft": { "$type": "color", "$value": "#F59E0B1F" },
+      "dangerSoft": { "$type": "color", "$value": "#EF44441F" }
+    },
+    "chart": {
+      "$description": "Data colours, checked at >= 3:1 against midnight. Never encode meaning by hue alone: pair with line style, marker shape and direct labels.",
+      "after": { "$type": "color", "$value": "#4C9DFF", "$description": "Current / after run. Solid 2px line" },
+      "before": { "$type": "color", "$value": "#A3B3C6", "$description": "Baseline / before run. Dashed 6-4 line" },
+      "series3": { "$type": "color", "$value": "#2DD4BF", "$description": "Dotted line or square marker" },
+      "series4": { "$type": "color", "$value": "#C084FC", "$description": "Dash-dot line or triangle marker" },
+      "spike": { "$type": "color", "$value": "#F87171", "$description": "Frame-time spikes: also mark with a diamond and a text annotation" },
+      "threshold": { "$type": "color", "$value": "#F59E0B", "$description": "Target / budget line (e.g. refresh-rate frame budget), dashed with label" },
+      "grid": { "$type": "color", "$value": "#2C3038", "$description": "Decorative gridlines, 1px" },
+      "axis": { "$type": "color", "$value": "#9BA3AE", "$description": "Axis text and ticks" },
+      "areaAfter": { "$type": "color", "$value": "#4C9DFF26", "$description": "Area under the 'after' line, 15%" },
+      "noiseBand": { "$type": "color", "$value": "#9BA3AE1F", "$description": "Run-to-run variation band" }
+    }
+  },
+  "font": {
+    "family": {
+      "display": { "$type": "fontFamily", "$value": ["Archivo Black", "Inter Tight", "Segoe UI", "sans-serif"], "$description": "Headlines and big numbers. Archivo Black has NO Cyrillic: Inter Tight 800 renders Russian glyphs. Set weight 800 and font-synthesis: none" },
+      "ui": { "$type": "fontFamily", "$value": ["Inter", "Segoe UI Variable", "Segoe UI", "sans-serif"] },
+      "mono": { "$type": "fontFamily", "$value": ["Cascadia Mono", "Consolas", "monospace"], "$description": "Paths, registry keys, logs" }
+    },
+    "weight": {
+      "regular": { "$type": "fontWeight", "$value": 400 },
+      "medium": { "$type": "fontWeight", "$value": 500 },
+      "semibold": { "$type": "fontWeight", "$value": 600 },
+      "display": { "$type": "fontWeight", "$value": 800 }
+    }
+  },
+  "typography": {
+    "$description": "Two scales: 'app' for the Windows program (base 14px, mouse-first desktop) and 'brand' for site and marketing (base 16px).",
+    "app": {
+      "title": { "$type": "typography", "$value": { "fontFamily": "{font.family.display}", "fontWeight": 800, "fontSize": "28px", "lineHeight": 1.15, "letterSpacing": "-0.01em" } },
+      "h2": { "$type": "typography", "$value": { "fontFamily": "{font.family.display}", "fontWeight": 800, "fontSize": "20px", "lineHeight": 1.2, "letterSpacing": "0" } },
+      "h3": { "$type": "typography", "$value": { "fontFamily": "{font.family.ui}", "fontWeight": 600, "fontSize": "16px", "lineHeight": 1.3, "letterSpacing": "0" } },
+      "body": { "$type": "typography", "$value": { "fontFamily": "{font.family.ui}", "fontWeight": 400, "fontSize": "14px", "lineHeight": 1.5, "letterSpacing": "0" } },
+      "bodyStrong": { "$type": "typography", "$value": { "fontFamily": "{font.family.ui}", "fontWeight": 600, "fontSize": "14px", "lineHeight": 1.5, "letterSpacing": "0" } },
+      "caption": { "$type": "typography", "$value": { "fontFamily": "{font.family.ui}", "fontWeight": 400, "fontSize": "12px", "lineHeight": 1.45, "letterSpacing": "0" } },
+      "label": { "$type": "typography", "$value": { "fontFamily": "{font.family.ui}", "fontWeight": 600, "fontSize": "11px", "lineHeight": 1.3, "letterSpacing": "0.1em", "textTransform": "uppercase" } },
+      "metricXL": { "$type": "typography", "$value": { "fontFamily": "{font.family.display}", "fontWeight": 800, "fontSize": "40px", "lineHeight": 1, "letterSpacing": "-0.01em", "fontVariantNumeric": "tabular-nums" } },
+      "metric": { "$type": "typography", "$value": { "fontFamily": "{font.family.display}", "fontWeight": 800, "fontSize": "28px", "lineHeight": 1, "letterSpacing": "0", "fontVariantNumeric": "tabular-nums" } },
+      "data": { "$type": "typography", "$value": { "fontFamily": "{font.family.ui}", "fontWeight": 500, "fontSize": "13px", "lineHeight": 1.4, "letterSpacing": "0", "fontVariantNumeric": "tabular-nums" } }
+    },
+    "brand": {
+      "display": { "$type": "typography", "$value": { "fontFamily": "{font.family.display}", "fontWeight": 800, "fontSize": "64px", "lineHeight": 1.05, "letterSpacing": "-0.01em" } },
+      "h1": { "$type": "typography", "$value": { "fontFamily": "{font.family.display}", "fontWeight": 800, "fontSize": "40px", "lineHeight": 1.1, "letterSpacing": "-0.01em" } },
+      "h2": { "$type": "typography", "$value": { "fontFamily": "{font.family.display}", "fontWeight": 800, "fontSize": "28px", "lineHeight": 1.2, "letterSpacing": "0" } },
+      "body": { "$type": "typography", "$value": { "fontFamily": "{font.family.ui}", "fontWeight": 400, "fontSize": "16px", "lineHeight": 1.55, "letterSpacing": "0" } },
+      "label": { "$type": "typography", "$value": { "fontFamily": "{font.family.ui}", "fontWeight": 600, "fontSize": "12px", "lineHeight": 1.3, "letterSpacing": "0.1em", "textTransform": "uppercase" } }
+    }
+  },
+  "space": {
+    "$description": "4px grid.",
+    "0": { "$type": "dimension", "$value": "0px" },
+    "0_5": { "$type": "dimension", "$value": "2px" },
+    "1": { "$type": "dimension", "$value": "4px" },
+    "2": { "$type": "dimension", "$value": "8px" },
+    "3": { "$type": "dimension", "$value": "12px" },
+    "4": { "$type": "dimension", "$value": "16px" },
+    "5": { "$type": "dimension", "$value": "20px" },
+    "6": { "$type": "dimension", "$value": "24px" },
+    "8": { "$type": "dimension", "$value": "32px" },
+    "10": { "$type": "dimension", "$value": "40px" },
+    "12": { "$type": "dimension", "$value": "48px" },
+    "16": { "$type": "dimension", "$value": "64px" }
+  },
+  "radius": {
+    "xs": { "$type": "dimension", "$value": "4px", "$description": "Badges, chips, checkboxes" },
+    "sm": { "$type": "dimension", "$value": "6px", "$description": "Nav items, inputs, small cards" },
+    "md": { "$type": "dimension", "$value": "8px", "$description": "Buttons, cards, panels" },
+    "lg": { "$type": "dimension", "$value": "12px", "$description": "Dialogs, window corners (Windows 11 uses 8px)" },
+    "full": { "$type": "dimension", "$value": "999px" },
+    "iconRatio": { "$type": "number", "$value": 0.21875, "$description": "App icon tile corner = 14/64 of tile size. Do not change" }
+  },
+  "size": {
+    "control": {
+      "sm": { "$type": "dimension", "$value": "28px" },
+      "md": { "$type": "dimension", "$value": "36px", "$description": "Default desktop control height" },
+      "lg": { "$type": "dimension", "$value": "44px", "$description": "Primary actions and nav items" }
+    },
+    "titleBar": { "$type": "dimension", "$value": "44px" },
+    "sidebar": { "$type": "dimension", "$value": "232px" },
+    "contentPadding": { "$type": "dimension", "$value": "32px" },
+    "windowMin": { "$type": "dimension", "$value": "1100px x 700px" },
+    "focusRing": { "$type": "dimension", "$value": "2px" },
+    "focusOffset": { "$type": "dimension", "$value": "2px" },
+    "border": { "$type": "dimension", "$value": "1px" },
+    "chartStroke": { "$type": "dimension", "$value": "2px" },
+    "logoMinWidth": { "$type": "dimension", "$value": "120px", "$description": "Below this use the icon only" },
+    "iconMin": { "$type": "dimension", "$value": "16px" }
+  },
+  "elevation": {
+    "$description": "On dark, separate layers with borders first; shadows only for floating layers.",
+    "popover": { "$type": "shadow", "$value": { "offsetX": "0px", "offsetY": "8px", "blur": "24px", "spread": "0px", "color": "#00000066" } },
+    "dialog": { "$type": "shadow", "$value": { "offsetX": "0px", "offsetY": "16px", "blur": "48px", "spread": "0px", "color": "#00000080" } }
+  },
+  "state": {
+    "$description": "Interactive states. Every state change is animated with motion.duration.fast unless noted.",
+    "buttonPrimary": {
+      "rest": { "$type": "color", "$value": "{brand.deepBlue}" },
+      "hover": { "$type": "color", "$value": "#0070F0", "$description": "White text 4.59:1" },
+      "pressed": { "$type": "color", "$value": "#0057B8", "$description": "White text 6.87:1" },
+      "disabledBg": { "$type": "color", "$value": "{brand.graphite}" },
+      "disabledText": { "$type": "color", "$value": "#8B939E" }
+    },
+    "buttonSecondary": {
+      "rest": { "$type": "color", "$value": "#00000000", "$description": "Transparent with border.strong" },
+      "hover": { "$type": "color", "$value": "#22252B" },
+      "pressed": { "$type": "color", "$value": "#2C3038" }
+    },
+    "navItem": {
+      "rest": { "$type": "color", "$value": "#00000000" },
+      "hover": { "$type": "color", "$value": "#22252B" },
+      "selected": { "$type": "color", "$value": "#2C3038", "$description": "Plus a 3px tuneBlue indicator on the left edge" }
+    },
+    "row": {
+      "hover": { "$type": "color", "$value": "#22252B" },
+      "selected": { "$type": "color", "$value": "#007BFF29" }
+    },
+    "focus": {
+      "ring": { "$type": "color", "$value": "#4C9DFF", "$description": "2px ring, 2px offset, keyboard focus only (:focus-visible)" }
+    },
+    "disabledOpacity": { "$type": "number", "$value": 0.45 }
+  },
+  "motion": {
+    "$description": "Motion explains change; it never decorates. Animate transform and opacity (and SVG stroke-dashoffset for line draws). With reduced motion: show the final state immediately and keep live charts static until the user presses Play.",
+    "duration": {
+      "instant": { "$type": "duration", "$value": "0ms" },
+      "xfast": { "$type": "duration", "$value": "90ms", "$description": "Press feedback" },
+      "fast": { "$type": "duration", "$value": "140ms", "$description": "Hover, focus, toggles" },
+      "base": { "$type": "duration", "$value": "200ms", "$description": "Small panels, tooltips, view fades" },
+      "moderate": { "$type": "duration", "$value": "280ms", "$description": "Drawers, expanding cards, dialogs in" },
+      "slow": { "$type": "duration", "$value": "400ms", "$description": "Large layout changes" },
+      "chartEnter": { "$type": "duration", "$value": "700ms", "$description": "First draw of a line / bars" },
+      "chartUpdate": { "$type": "duration", "$value": "450ms", "$description": "Morph to new data" },
+      "counter": { "$type": "duration", "$value": "900ms", "$description": "KPI number count-up after a measurement completes" },
+      "gauge": { "$type": "duration", "$value": "900ms", "$description": "Verdict gauge sweep" },
+      "stagger": { "$type": "duration", "$value": "40ms", "$description": "Per-item delay; max 8 items, then no stagger" },
+      "exit": { "$type": "duration", "$value": "120ms", "$description": "Exits are faster than entrances" },
+      "skeletonLoop": { "$type": "duration", "$value": "1400ms" },
+      "liveSample": { "$type": "duration", "$value": "250ms", "$description": "UI refresh cadence of the live frame-time stream (data may arrive faster; batch it)" }
+    },
+    "easing": {
+      "standard": { "$type": "cubicBezier", "$value": [0.2, 0, 0, 1], "$description": "Default for state and layout changes" },
+      "decelerate": { "$type": "cubicBezier", "$value": [0.05, 0.7, 0.1, 1], "$description": "Entrances, chart draws, counters" },
+      "accelerate": { "$type": "cubicBezier", "$value": [0.3, 0, 0.8, 0.15], "$description": "Exits" },
+      "linear": { "$type": "cubicBezier", "$value": [0, 0, 1, 1], "$description": "Progress bars, spinners, live stream scrolling" }
+    },
+    "distance": {
+      "nudge": { "$type": "dimension", "$value": "2px" },
+      "enter": { "$type": "dimension", "$value": "8px", "$description": "Fade-up offset for cards" },
+      "panel": { "$type": "dimension", "$value": "16px" }
+    }
+  }
+}

@@ -2,7 +2,7 @@ import * as React from "react";
 import { useWidth } from "@/lib/hooks";
 import { prefersReducedMotion } from "@/lib/utils";
 
-/* A live-looking frame-time trace for the hero: the thing FramePilot actually looks at.
+/* A live-looking frame-time trace for the hero: the thing TuneFPS actually looks at.
    It plays a synthetic recording (labelled as such) — a steady ~240 FPS pace with occasional hitches. */
 
 function makeSource(n: number) {
@@ -81,8 +81,8 @@ export function FrameTrace({ caption, p99Label, spikeLabel }: { caption: string;
           <svg width={width} height={H} viewBox={`0 0 ${width} ${H}`} className="absolute inset-0" aria-hidden="true">
             <defs>
               <linearGradient id="fp-trace-fill" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0" stopColor="#CBFF4D" stopOpacity=".22" />
-                <stop offset="1" stopColor="#CBFF4D" stopOpacity="0" />
+                <stop offset="0" stopColor="#4C9DFF" stopOpacity=".22" />
+                <stop offset="1" stopColor="#4C9DFF" stopOpacity="0" />
               </linearGradient>
               <linearGradient id="fp-trace-fade" x1="0" x2="1">
                 <stop offset="0" stopColor="#fff" stopOpacity="0" />
@@ -96,29 +96,30 @@ export function FrameTrace({ caption, p99Label, spikeLabel }: { caption: string;
             </defs>
             {[4.17, 8.33, 16.67].map((v) => (
               <g key={v}>
-                <line x1={pad.l} x2={width - pad.r} y1={Y(v)} y2={Y(v)} stroke="rgba(244,246,239,.1)" />
-                <text x={pad.l - 8} y={Y(v) + 3.5} textAnchor="end" fontSize="10" fill="#AEB8AE" fontFamily="Arial, Helvetica, sans-serif">
+                <line x1={pad.l} x2={width - pad.r} y1={Y(v)} y2={Y(v)} stroke="rgba(255,255,255,.1)" />
+                <text x={pad.l - 8} y={Y(v) + 3.5} textAnchor="end" fontSize="10" fill="#9BA3AE" fontFamily="Inter, 'Segoe UI', sans-serif">
                   {v}
                 </text>
               </g>
             ))}
-            <line x1={pad.l} x2={width - pad.r} y1={Y(p99)} y2={Y(p99)} stroke="#F4F6EF" strokeDasharray="4 5" strokeOpacity=".7" />
-            <text x={pad.l + 4} y={Y(p99) - 6} textAnchor="start" fontSize="10.5" fill="#F4F6EF" fontFamily="Arial, Helvetica, sans-serif">
+            <line x1={pad.l} x2={width - pad.r} y1={Y(p99)} y2={Y(p99)} stroke="#FFFFFF" strokeDasharray="4 5" strokeOpacity=".7" />
+            <text x={pad.l + 4} y={Y(p99) - 6} textAnchor="start" fontSize="10.5" fill="#FFFFFF" fontFamily="Inter, 'Segoe UI', sans-serif">
               {p99Label} {p99.toFixed(1)}
             </text>
             <g mask="url(#fp-trace-mask)">
               <path ref={area} fill="url(#fp-trace-fill)" />
-              <path ref={path} fill="none" stroke="#CBFF4D" strokeWidth="1.6" strokeLinejoin="round" />
+              <path ref={path} fill="none" stroke="#4C9DFF" strokeWidth="1.6" strokeLinejoin="round" />
             </g>
             <g ref={mark} style={{ opacity: 0, transition: "opacity .2s" }}>
-              <rect x="-4" y="-4" width="8" height="8" fill="#101412" stroke="#F4F6EF" strokeWidth="2" />
-              <rect x="8" y="-22" width="92" height="20" rx="2" fill="#F4F6EF" />
-              <text x="14" y="-8" fontSize="11" fontWeight="700" fill="#101412" fontFamily="Arial, Helvetica, sans-serif" />
+              {/* brand rule: spikes are marked with a diamond and text, never colour alone */}
+              <rect x="-4.5" y="-4.5" width="9" height="9" transform="rotate(45)" fill="#111214" stroke="#F87171" strokeWidth="2" />
+              <rect x="10" y="-22" width="92" height="20" rx="4" fill="#F87171" />
+              <text x="16" y="-8" fontSize="11" fontWeight="700" fill="#111214" fontFamily="Inter, 'Segoe UI', sans-serif" />
             </g>
           </svg>
         )}
       </div>
-      <figcaption className="mt-3 text-[13px] text-muted-dark">{caption}</figcaption>
+      <figcaption className="mt-3 text-[13px] text-muted">{caption}</figcaption>
     </figure>
   );
 }

@@ -26,22 +26,22 @@ function Header({ route }: { route: string }) {
   const { t, lang, setLang } = useLang();
   const toHome = (e: React.MouseEvent) => { if (route !== "home") { e.preventDefault(); location.hash = "#/"; } };
   return (
-    <header className="sticky top-0 z-40 border-b border-border-light bg-paper/95 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-line bg-app/90 backdrop-blur">
       <div className="wrap flex h-[72px] items-center gap-8">
-        <a href="#/" className="shrink-0 text-ink" aria-label="FRAMEPILOT">
-          <Logo height={36} decorative />
+        <a href="#/" className="shrink-0 text-fg" aria-label="TuneFPS">
+          <Logo height={30} decorative />
         </a>
-        <nav className="hidden flex-1 items-center gap-7 text-[15px] text-muted-light lg:flex" aria-label="Main">
-          <a className="hover:text-ink" href="#how" onClick={toHome}>{t.nav_product}</a>
-          <a className={cn("hover:text-ink", route === "report" && "text-ink")} href="#/report">{t.nav_report}</a>
-          <a className="hover:text-ink" href="#pricing" onClick={toHome}>{t.nav_pricing}</a>
-          <a className="hover:text-ink" href="#faq" onClick={toHome}>{t.nav_faq}</a>
+        <nav className="hidden flex-1 items-center gap-7 text-[15px] text-muted lg:flex" aria-label="Main">
+          <a className="hover:text-fg" href="#how" onClick={toHome}>{t.nav_product}</a>
+          <a className={cn("hover:text-fg", route === "report" && "text-fg")} href="#/report">{t.nav_report}</a>
+          <a className="hover:text-fg" href="#pricing" onClick={toHome}>{t.nav_pricing}</a>
+          <a className="hover:text-fg" href="#faq" onClick={toHome}>{t.nav_faq}</a>
         </nav>
         <div className="ml-auto flex items-center gap-3">
-          <div className="flex rounded-[4px] border border-border-light p-0.5 text-[13px] font-bold" role="group" aria-label="Language">
+          <div className="flex rounded-[8px] border border-line p-0.5 text-[13px] font-bold" role="group" aria-label="Language">
             {(["ru", "en"] as const).map((l) => (
               <button key={l} type="button" aria-pressed={lang === l} onClick={() => setLang(l)}
-                className={cn("h-10 w-11 cursor-pointer rounded-[3px] uppercase", lang === l ? "bg-ink text-paper" : "text-muted-light hover:text-ink")}>{l}</button>
+                className={cn("h-10 w-11 cursor-pointer rounded-[6px] uppercase", lang === l ? "bg-raised text-fg" : "text-muted hover:text-fg")}>{l}</button>
             ))}
           </div>
           <ButtonLink href={DOWNLOAD_URL} size="sm" className="hidden sm:inline-flex">{t.download_short}</ButtonLink>
@@ -54,12 +54,12 @@ function Header({ route }: { route: string }) {
 function Footer() {
   const { t } = useLang();
   return (
-    <footer className="bg-ink text-paper">
-      <div className="wrap flex flex-wrap items-center gap-x-10 gap-y-4 py-12 text-[14px] text-muted-dark">
-        <span className="text-paper"><Logo height={36} /></span>
+    <footer className="bg-sunken text-fg">
+      <div className="wrap flex flex-wrap items-center gap-x-10 gap-y-4 py-12 text-[14px] text-muted">
+        <span className="text-fg"><Logo height={30} /></span>
         <span>{t.footer_privacy}</span>
         <span>{t.footer_name}</span>
-        <a href={REPO_URL} className="ml-auto hover:text-paper">GitHub</a>
+        <a href={REPO_URL} className="ml-auto hover:text-fg">GitHub</a>
       </div>
     </footer>
   );
@@ -70,7 +70,7 @@ function Shell() {
   const { t } = useLang();
   return (
     <>
-      <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-[4px] focus:bg-accent focus:px-3 focus:py-2 focus:text-ink">
+      <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-[8px] focus:bg-cta focus:px-3 focus:py-2 focus:text-fg">
         {t.nav_product}
       </a>
       <Header route={route} />

@@ -1,4 +1,4 @@
-/* Types and parsing for the FramePilot diagnostic report (schema framepilot.report/1),
+/* Types and parsing for the TuneFPS diagnostic report (schema framepilot.report/1),
    exported from the Windows app: Settings → Reports → Export JSON. */
 
 export interface Measured<T> {
@@ -207,8 +207,9 @@ export function parseReport(text: string): DiagnosticReport {
   }
   if (!raw || typeof raw !== "object") throw new ReportError("not-json");
   const r = raw as Partial<DiagnosticReport>;
-  if (typeof r.schema !== "string" || !r.schema.startsWith("framepilot.report/")) throw new ReportError("not-framepilot");
-  if (r.schema !== "framepilot.report/1") throw new ReportError("schema");
+  if (typeof r.schema !== "string" || !/^(framepilot|tunefps)\.report\//.test(r.schema)) throw new ReportError("not-framepilot");
+  // framepilot.report/1 is what app 1.0.x exports; tunefps.report/1 is accepted for the renamed app.
+  if (r.schema !== "framepilot.report/1" && r.schema !== "tunefps.report/1") throw new ReportError("schema");
   const report: DiagnosticReport = {
     schema: r.schema,
     generatedAt: String(r.generatedAt ?? ""),

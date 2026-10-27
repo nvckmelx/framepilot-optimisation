@@ -1,5 +1,5 @@
 "use client";
-/* Performance Bento: a FramePilot session dashboard in the spirit of a finance bento board.
+/* Performance Bento: a TuneFPS session dashboard in the spirit of a finance bento board.
    Frame-time stream, before/after verdict, KPI tiles, distribution, run ranges, run columns,
    recommendations, system and change journal. Pure React + SVG, no chart library. */
 import * as React from "react";
@@ -11,13 +11,13 @@ import { CheckIcon } from "@/components/ui/icons";
 import type { DiagnosticReport, Measured, MetricComparison, SessionRecord } from "@/lib/report";
 import { gameName, tr } from "@/lib/report";
 
-/* ---------------- tokens (FRAMEPILOT brand system 1.0) ---------------- */
-const VOLT = "#CBFF4D"; // Accent
-const PAPER = "#F4F6EF";
-const MOSS = "#586258"; // muted light, used for the diagnostic group swatch
-const FLARE = "#FF6B5E"; // interface-only state colour, always paired with text
-const BASE = "#AEB8AE"; // muted dark: baseline runs
-const MONO = "Arial, Helvetica, sans-serif";
+/* ---------------- tokens (TuneFPS brand 1.0, design-tokens.json) ---------------- */
+const VOLT = "#4C9DFF"; // TuneFPS accent-strong: the "after" series and highlights
+const PAPER = "#FFFFFF";
+const MOSS = "#6E7682"; // muted light, used for the diagnostic group swatch
+const FLARE = "#F87171"; // interface-only state colour, always paired with text
+const BASE = "#A3B3C6"; // Steel: the "before" (baseline) series
+const MONO = "Inter, 'Segoe UI', sans-serif";
 
 /* ---------------- tooltip ---------------- */
 type Tip = { x: number; y: number; title: string; rows: [string, string, string?][] } | null;
@@ -37,19 +37,19 @@ function Tooltip({ tip }: { tip: Tip }) {
   }, [tip]);
   return (
     <div ref={ref} role="status" aria-live="polite"
-      className={cn("pointer-events-none fixed z-50 min-w-40 rounded-[4px] border border-border-dark bg-ink px-3 py-2.5 text-[12px] text-paper shadow-[0_14px_34px_-12px_rgba(0,0,0,.6)] transition-opacity duration-[180ms]",
+      className={cn("pointer-events-none fixed z-50 min-w-40 rounded-[4px] border border-line bg-sunken px-3 py-2.5 text-[12px] text-fg shadow-[0_14px_34px_-12px_rgba(0,0,0,.6)] transition-opacity duration-[180ms]",
         tip ? "opacity-100" : "opacity-0")}
       style={pos}>
       {tip && (
         <>
-          <div className="mb-1.5 font-bold text-muted-dark">{tip.title}</div>
+          <div className="mb-1.5 font-bold text-muted">{tip.title}</div>
           {tip.rows.map(([k, v, c]) => (
             <div key={k} className="flex items-center justify-between gap-5 leading-5">
-              <span className="inline-flex items-center gap-1.5 text-muted-dark">
+              <span className="inline-flex items-center gap-1.5 text-muted">
                 {c && <i className="inline-block size-1.5" style={{ background: c }} />}
                 {k}
               </span>
-              <b className="font-mono font-bold tabular text-paper">{v}</b>
+              <b className="font-mono font-bold tabular text-fg">{v}</b>
             </div>
           ))}
         </>
@@ -71,15 +71,15 @@ function Tile({ solid, className, children, label }: {
 
 const Title = ({ children, sub, dark }: { children: React.ReactNode; sub?: React.ReactNode; dark?: boolean }) => (
   <div>
-    <h3 className={cn("text-[18px] font-bold tracking-[-0.02em]", dark && "text-ink")}>{children}</h3>
-    {sub && <p className={cn("mt-0.5 text-[12.5px]", dark ? "text-ink/65" : "text-paper/55")}>{sub}</p>}
+    <h3 className={cn("text-[18px] font-bold tracking-[-0.02em]", dark && "text-fg")}>{children}</h3>
+    {sub && <p className={cn("mt-0.5 text-[12.5px]", dark ? "text-fg/80" : "text-fg/55")}>{sub}</p>}
   </div>
 );
 
 const Na = ({ m, children }: { m: Measured<unknown> | undefined; children: React.ReactNode }) => {
   const { t } = useLang();
   if (m && m.isAvailable) return <>{children}</>;
-  return <span className="text-paper/45 underline decoration-dotted underline-offset-4" title={`${m?.unavailableReason ?? ""} — ${m?.source ?? ""}`}>{t.unavailable}</span>;
+  return <span className="text-fg/60 underline decoration-dotted underline-offset-4" title={`${m?.unavailableReason ?? ""} — ${m?.source ?? ""}`}>{t.unavailable}</span>;
 };
 
 /* ---------------- frame-time stream ---------------- */
@@ -91,7 +91,7 @@ function FrameTimeChart({ report }: { report: DiagnosticReport }) {
   const g = useProgress(1100, fs?.sessionId);
   const [hover, setHover] = React.useState<number | null>(null);
   const H = 230;
-  if (!fs || fs.maxFrameTimeMs.length < 2) return <p className="mt-auto max-w-md text-sm text-paper/70">{t.no_frames}</p>;
+  if (!fs || fs.maxFrameTimeMs.length < 2) return <p className="mt-auto max-w-md text-sm text-fg/70">{t.no_frames}</p>;
   const n = fs.maxFrameTimeMs.length;
   const sortedMean = [...fs.meanFrameTimeMs].sort((a, b) => a - b);
   const typical = sortedMean[Math.floor(n / 2)];
@@ -141,19 +141,20 @@ function FrameTimeChart({ report }: { report: DiagnosticReport }) {
           aria-label={`${t.t_frametime}: P99 ${fmt(p99, 2, lang)} ${t.ms}`}>
           {gridVals.map((v) => (
             <g key={v}>
-              <line x1={L} x2={W - R} y1={Y(v)} y2={Y(v)} stroke="rgba(244,246,239,.1)" />
-              <text x={L - 8} y={Y(v) + 3.5} textAnchor="end" fontSize="10" fill="#AEB8AE" fontFamily={MONO}>{v}</text>
+              <line x1={L} x2={W - R} y1={Y(v)} y2={Y(v)} stroke="rgba(255,255,255,.1)" />
+              <text x={L - 8} y={Y(v) + 3.5} textAnchor="end" fontSize="10" fill="#A3B3C6" fontFamily={MONO}>{v}</text>
             </g>
           ))}
-          <path d={areaD} fill={VOLT} fillOpacity=".92" />
-          <path d={meanD} fill="none" stroke="#101412" strokeWidth="1.6" strokeOpacity=".85" />
+          <path d={areaD} fill={VOLT} fillOpacity=".16" />
+          <path d={maxD} fill="none" stroke={VOLT} strokeWidth="1.4" strokeLinejoin="round" />
+          <path d={meanD} fill="none" stroke={PAPER} strokeWidth="1.4" strokeOpacity=".85" strokeLinejoin="round" />
           <g style={{ opacity: g > 0.7 ? 1 : 0, transition: "opacity .4s" }}>
             <line x1={L} x2={W - R} y1={Y(p99)} y2={Y(p99)} stroke={PAPER} strokeDasharray="5 5" strokeWidth="1.4" />
             <rect x={W - R - 96} y={Y(p99) - 21} width="92" height="18" rx="2" fill={PAPER} />
-            <text x={W - R - 50} y={Y(p99) - 8} textAnchor="middle" fontSize="11" fontWeight="700" fill="#101412" fontFamily={MONO}>P99 {fmt(p99, 2, lang)}</text>
+            <text x={W - R - 50} y={Y(p99) - 8} textAnchor="middle" fontSize="11" fontWeight="700" fill="#111214" fontFamily={MONO}>P99 {fmt(p99, 2, lang)}</text>
           </g>
           {ticks.map((s) => (
-            <text key={s} x={L + (s / seconds) * (W - L - R)} y={H - 7} textAnchor="middle" fontSize="10" fill="#AEB8AE" fontFamily={MONO}>{s}s</text>
+            <text key={s} x={L + (s / seconds) * (W - L - R)} y={H - 7} textAnchor="middle" fontSize="10" fill="#A3B3C6" fontFamily={MONO}>{s}s</text>
           ))}
           {hover !== null && <line x1={X(hover)} x2={X(hover)} y1={T} y2={base} stroke={PAPER} strokeOpacity=".7" strokeWidth="1.2" />}
           <rect x={L} y={0} width={Math.max(0, W - L - R)} height={H} fill="transparent"
@@ -173,7 +174,7 @@ function VerdictTile({ report }: { report: DiagnosticReport }) {
     return (
       <Tile label={t.t_verdict} className="min-h-[390px] lg:col-span-4 md:col-span-6">
         <Title>{t.t_verdict}</Title>
-        <p className="mt-auto text-[15px] leading-6 text-paper/80">{t.t_verdict_none}</p>
+        <p className="mt-auto text-[15px] leading-6 text-fg/80">{t.t_verdict_none}</p>
       </Tile>
     );
   const good = c.metrics.filter((m) => m.verdict === "Improved").length;
@@ -189,39 +190,39 @@ function VerdictTile({ report }: { report: DiagnosticReport }) {
     <Tile label={t.t_verdict} className="min-h-[390px] lg:col-span-4 md:col-span-6">
       <div className="flex items-start justify-between gap-3">
         <Title>{t.t_verdict}</Title>
-        <span className="rounded-[4px] border border-border-dark px-2.5 py-1 text-[12px] font-bold text-paper/80 tabular">
+        <span className="rounded-[4px] border border-line px-2.5 py-1 text-[12px] font-bold text-fg/80 tabular">
           {c.metrics[0]?.baselineRuns ?? 0} + {c.metrics[0]?.afterRuns ?? 0}
         </span>
       </div>
       <svg viewBox="-125 -122 250 132" className="mx-auto mt-3 w-full max-w-[260px]" aria-hidden="true">
         {ticks.map((k, i) => (
-          <line key={i} x1={k.x1} y1={k.y1} x2={k.x2} y2={k.y2} stroke={k.on ? VOLT : "rgba(244,246,239,.22)"} strokeWidth="3" strokeLinecap="square" />
+          <line key={i} x1={k.x1} y1={k.y1} x2={k.x2} y2={k.y2} stroke={k.on ? VOLT : "rgba(255,255,255,.22)"} strokeWidth="3" strokeLinecap="square" />
         ))}
-        <text y="-26" textAnchor="middle" fontSize="44" fontWeight="700" fill={PAPER} letterSpacing="-1.5" fontFamily={MONO}>{good}<tspan fontSize="20" fill="rgba(244,246,239,.5)">/{c.metrics.length}</tspan></text>
-        <text y="-4" textAnchor="middle" fontSize="11" fill="rgba(244,246,239,.55)">{t.verdict.Improved}</text>
+        <text y="-26" textAnchor="middle" fontSize="44" fontWeight="700" fill={PAPER} letterSpacing="-1.5" fontFamily={MONO}>{good}<tspan fontSize="20" fill="rgba(255,255,255,.5)">/{c.metrics.length}</tspan></text>
+        <text y="-4" textAnchor="middle" fontSize="11" fill="rgba(255,255,255,.55)">{t.verdict.Improved}</text>
       </svg>
       <p className="mt-1 text-[13.5px] font-bold leading-5" style={{ color: tone }}>{t.verdict[c.overall]}</p>
-      <p className="mt-1 text-[12.5px] leading-[18px] text-paper/60">{tr(c.summary, lang)}</p>
+      <p className="mt-1 text-[12.5px] leading-[18px] text-fg/60">{tr(c.summary, lang)}</p>
       <ul className="mt-auto pt-3">
         {c.metrics.map((m, i) => (
           <li key={m.metric} className={cn("flex h-8 items-center gap-2 text-[13px]", i && "border-t border-white/10")}>
-            <span className={cn("grid size-4 place-items-center", m.verdict === "Improved" ? "bg-accent text-ink" : "bg-white/10 text-transparent")}>
+            <span className={cn("grid size-4 place-items-center", m.verdict === "Improved" ? "bg-cta text-fg" : "bg-white/10 text-transparent")}>
               <CheckIcon width={12} height={12} strokeWidth={3} />
             </span>
             <span className="flex-1 font-bold">{t.metric[m.metric] ?? m.metric}</span>
-            <span className="font-mono text-[12px] tabular" style={{ color: m.verdict === "Improved" ? VOLT : m.verdict === "Regressed" ? FLARE : "rgba(244,246,239,.55)" }}>
+            <span className="font-mono text-[12px] tabular" style={{ color: m.verdict === "Improved" ? VOLT : m.verdict === "Regressed" ? FLARE : "rgba(255,255,255,.55)" }}>
               {m.deltaPercent > 0 ? "+" : ""}{fmt(m.deltaPercent, 1, lang)}%
             </span>
           </li>
         ))}
       </ul>
-      {c.warnings.length > 0 && <p className="mt-2 text-[12px] text-muted-dark">⚠ {c.warnings.map((w) => tr(w, lang)).join(" · ")}</p>}
+      {c.warnings.length > 0 && <p className="mt-2 text-[12px] text-muted">⚠ {c.warnings.map((w) => tr(w, lang)).join(" · ")}</p>}
     </Tile>
   );
 }
 
 /* ---------------- KPI ---------------- */
-function Spark({ sessions, pick, color }: { sessions: SessionRecord[]; pick: (s: SessionRecord) => number; color: string }) {
+function Spark({ sessions, pick, color, solid }: { sessions: SessionRecord[]; pick: (s: SessionRecord) => number; color: string; solid?: boolean }) {
   const [ref, W] = useWidth<HTMLDivElement>();
   const H = 30;
   const vals = sessions.map(pick);
@@ -236,7 +237,7 @@ function Spark({ sessions, pick, color }: { sessions: SessionRecord[]; pick: (s:
           <path d={vals.map((v, i) => `${i ? "L" : "M"}${X(i)},${Y(v)}`).join("")} fill="none" stroke={color} strokeOpacity=".5" strokeWidth="1.4" />
           {vals.map((v, i) => (
             <rect key={i} x={X(i) - 3} y={Y(v) - 3} width="6" height="6"
-              fill={sessions[i].group === "After" ? (color === "#101412" ? "#101412" : VOLT) : sessions[i].group === "Baseline" ? BASE : "rgba(244,246,239,.4)"} />
+              fill={sessions[i].group === "After" ? (color === PAPER && solid ? PAPER : VOLT) : sessions[i].group === "Baseline" ? BASE : "rgba(255,255,255,.4)"} />
           ))}
         </svg>
       )}
@@ -249,13 +250,13 @@ function Kpi({ label, value, unit, sub, sessions, pick, solid, children }: {
 }) {
   return (
     <Tile solid={solid} label={label} className="min-h-[172px] lg:col-span-3 md:col-span-6">
-      <div className={cn("text-[12.5px] font-bold", solid ? "text-ink/65" : "text-paper/60")}>{label}</div>
+      <div className={cn("text-[12.5px] font-bold", solid ? "text-fg/80" : "text-fg/60")}>{label}</div>
       <div className="mt-2 flex items-baseline gap-1.5">
-        <span className="text-[40px] font-bold leading-none tracking-[-0.03em] tabular">{value}</span>
-        {unit && <span className={cn("text-[15px] font-bold", solid ? "text-ink/60" : "text-paper/50")}>{unit}</span>}
+        <span className="display text-[40px] leading-none tracking-[-0.01em] tabular">{value}</span>
+        {unit && <span className={cn("text-[15px] font-bold", solid ? "text-fg/80" : "text-fg/60")}>{unit}</span>}
       </div>
-      <div className={cn("mt-1 text-[12px]", solid ? "text-ink/60" : "text-paper/45")}>{sub}</div>
-      <div className="mt-auto pt-2">{children ?? <Spark sessions={sessions} pick={pick} color={solid ? "#101412" : PAPER} />}</div>
+      <div className={cn("mt-1 text-[12px]", solid ? "text-fg/80" : "text-fg/60")}>{sub}</div>
+      <div className="mt-auto pt-2">{children ?? <Spark sessions={sessions} pick={pick} color={PAPER} solid={solid} />}</div>
     </Tile>
   );
 }
@@ -269,7 +270,7 @@ function Histogram({ report }: { report: DiagnosticReport }) {
   const session = report.sessions.find((s) => s.id === fs?.sessionId);
   const g = useProgress(900, fs?.sessionId);
   const H = 210;
-  if (!fs || fs.histogram.length === 0) return <p className="mt-auto text-sm text-paper/70">{t.no_frames}</p>;
+  if (!fs || fs.histogram.length === 0) return <p className="mt-auto text-sm text-fg/70">{t.no_frames}</p>;
   const total = fs.histogram.reduce((a, b) => a + b.count, 0);
   // Show the body of the distribution: up to ~2.2× P99 (min 8 ms); frames beyond are summarised as a tail.
   const p99 = session?.stats.p99FrameTimeMs ?? 16;
@@ -290,7 +291,7 @@ function Histogram({ report }: { report: DiagnosticReport }) {
             const hot = spike > 0 && b.fromMs >= spike;
             return (
               <rect key={i} x={L + i * bw + 0.5} y={H - B - h} width={Math.max(1, bw - 1)} height={h}
-                fill={hot ? FLARE : PAPER} fillOpacity={hot ? 1 : 0.88}
+                fill={hot ? FLARE : VOLT} fillOpacity={hot ? 1 : 0.85}
                 onPointerMove={(e) => setTip({ x: e.clientX, y: e.clientY, title: `${fmt(b.fromMs, 1, lang)}–${fmt(b.toMs, 1, lang)} ${t.ms}`,
                   rows: [[t.frames, fmt(b.count, 0, lang)], ["%", fmt((100 * b.count) / total, 2, lang)]] })}
                 onPointerLeave={() => setTip(null)} />
@@ -298,16 +299,16 @@ function Histogram({ report }: { report: DiagnosticReport }) {
           })}
           {[8.33, 16.67, 33.33].filter((v) => v < limitMs).map((v) => (
             <g key={v}>
-              <line x1={X(v)} x2={X(v)} y1={T} y2={H - B} stroke="rgba(244,246,239,.4)" strokeDasharray="3 4" />
-              <text x={X(v) + 4} y={T + 10} fontSize="10" fill="rgba(244,246,239,.85)" fontFamily={MONO}>{Math.round(1000 / v)} FPS</text>
+              <line x1={X(v)} x2={X(v)} y1={T} y2={H - B} stroke="rgba(255,255,255,.4)" strokeDasharray="3 4" />
+              <text x={X(v) + 4} y={T + 10} fontSize="10" fill="rgba(255,255,255,.85)" fontFamily={MONO}>{Math.round(1000 / v)} FPS</text>
             </g>
           ))}
           {Array.from({ length: Math.floor(limitMs / 4) + 1 }, (_, i) => i * 4).map((ms) => (
-            <text key={ms} x={X(ms)} y={H - 7} textAnchor="middle" fontSize="10" fill="rgba(244,246,239,.7)" fontFamily={MONO}>{ms}</text>
+            <text key={ms} x={X(ms)} y={H - 7} textAnchor="middle" fontSize="10" fill="rgba(255,255,255,.7)" fontFamily={MONO}>{ms}</text>
           ))}
         </svg>
       )}
-      <div className="mt-1 flex justify-between text-[11.5px] text-paper/55">
+      <div className="mt-1 flex justify-between text-[11.5px] text-fg/55">
         <span>{t.ms} →</span>
         {tail > 0 && <span>+{fmt(tail, 0, lang)} {t.frames} &gt; {fmt(limitMs, 0, lang)} {t.ms}</span>}
       </div>
@@ -332,7 +333,7 @@ function Ranges({ metrics }: { metrics: MetricComparison[] }) {
           <li key={m.metric}>
             <div className="flex items-baseline justify-between text-[12.5px]">
               <span className="font-bold">{t.metric[m.metric] ?? m.metric}</span>
-              <span className="font-mono text-[11.5px] text-paper/60 tabular">{fmt(m.baselineMedian, 1, lang)} → <span style={{ color: m.verdict === "Improved" ? VOLT : PAPER }}>{fmt(m.afterMedian, 1, lang)}</span></span>
+              <span className="font-mono text-[11.5px] text-fg/60 tabular">{fmt(m.baselineMedian, 1, lang)} → <span style={{ color: m.verdict === "Improved" ? VOLT : PAPER }}>{fmt(m.afterMedian, 1, lang)}</span></span>
             </div>
             <div className="relative mt-1.5 h-[22px]">
               <div className="absolute inset-x-0 top-[10px] h-px bg-white/12" />
@@ -342,7 +343,7 @@ function Ranges({ metrics }: { metrics: MetricComparison[] }) {
           </li>
         );
       })}
-      <li className="flex gap-4 pt-1 text-[11.5px] text-paper/60">
+      <li className="flex gap-4 pt-1 text-[11.5px] text-fg/60">
         <span className="inline-flex items-center gap-1.5"><i className="inline-block h-[7px] w-3" style={{ background: BASE }} />{t.before}</span>
         <span className="inline-flex items-center gap-1.5"><i className="inline-block h-[7px] w-3" style={{ background: VOLT }} />{t.after}</span>
       </li>
@@ -358,7 +359,7 @@ function Runs({ sessions }: { sessions: SessionRecord[] }) {
   const g = useProgress(900, sessions.length);
   const H = 190;
   const shown = sessions.slice(-8);
-  if (shown.length === 0) return <p className="mt-auto text-sm text-paper/70">{t.no_sessions}</p>;
+  if (shown.length === 0) return <p className="mt-auto text-sm text-fg/70">{t.no_sessions}</p>;
   const maxV = Math.max(...shown.map((s) => s.stats.averageFps)) * 1.08;
   const B = 20;
   const bw = Math.min(26, (W - 8) / shown.length - 8);
@@ -371,15 +372,15 @@ function Runs({ sessions }: { sessions: SessionRecord[] }) {
             const x = gap / 2 + i * (bw + gap);
             const full = H - B - 4;
             const h = (s.stats.averageFps / maxV) * full * g;
-            const color = s.group === "After" ? VOLT : s.group === "Baseline" ? PAPER : "rgba(244,246,239,.45)";
+            const color = s.group === "After" ? VOLT : s.group === "Baseline" ? BASE : "rgba(255,255,255,.45)";
             return (
               <g key={s.id} onPointerMove={(e) => setTip({ x: e.clientX, y: e.clientY,
                 title: new Date(s.startedAt).toLocaleString(lang === "ru" ? "ru-RU" : "en-US", { dateStyle: "short", timeStyle: "short" }),
                 rows: [["FPS", fmt(s.stats.averageFps, 0, lang), color], ["P99", `${fmt(s.stats.p99FrameTimeMs, 2, lang)} ${t.ms}`], ["1% low", fmt(s.stats.onePercentLowFps, 0, lang)]] })}
                 onPointerLeave={() => setTip(null)}>
-                <rect x={x} y={4} width={bw} height={full} rx={bw / 2} fill="rgba(244,246,239,.07)" />
+                <rect x={x} y={4} width={bw} height={full} rx={bw / 2} fill="rgba(255,255,255,.07)" />
                 <rect x={x} y={4 + full - h} width={bw} height={h} rx={bw / 2} fill={color} />
-                <text x={x + bw / 2} y={H - 5} textAnchor="middle" fontSize="10" fill="rgba(244,246,239,.7)" fontFamily={MONO}>{i + 1}</text>
+                <text x={x + bw / 2} y={H - 5} textAnchor="middle" fontSize="10" fill="rgba(255,255,255,.7)" fontFamily={MONO}>{i + 1}</text>
               </g>
             );
           })}
@@ -405,9 +406,9 @@ function Recs({ report }: { report: DiagnosticReport }) {
       <div className="mt-4 flex h-2 gap-[3px]">
         {groups.filter((x) => x.n > 0).map((x) => <div key={x.k} style={{ flex: x.n / total, background: x.color }} />)}
       </div>
-      <div className="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-[12px] text-paper/65">
+      <div className="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-[12px] text-fg/65">
         {groups.map((x) => (
-          <span key={x.k} className="inline-flex items-center gap-1.5"><i className="inline-block size-2" style={{ background: x.color }} /><b className="font-mono font-bold text-paper">{x.n}</b> {x.label}</span>
+          <span key={x.k} className="inline-flex items-center gap-1.5"><i className="inline-block size-2" style={{ background: x.color }} /><b className="font-mono font-bold text-fg">{x.n}</b> {x.label}</span>
         ))}
       </div>
       <ul className="mt-4">
@@ -418,9 +419,9 @@ function Recs({ report }: { report: DiagnosticReport }) {
               <i className="mt-1.5 inline-block h-2.5 w-1 shrink-0" style={{ background: color }} />
               <div className="min-w-0 flex-1">
                 <div className="text-[13.5px] font-bold leading-5">{tr(r.title, lang)}</div>
-                <div className="text-[12.5px] leading-[18px] text-paper/55">{tr(r.symptom, lang)}</div>
+                <div className="text-[12.5px] leading-[18px] text-fg/55">{tr(r.symptom, lang)}</div>
               </div>
-              <span className="shrink-0 font-mono text-[11px] text-paper/45">{t.confidence[r.confidence]}</span>
+              <span className="shrink-0 font-mono text-[11px] text-fg/60">{t.confidence[r.confidence]}</span>
             </li>
           );
         })}
@@ -433,18 +434,18 @@ function Recs({ report }: { report: DiagnosticReport }) {
 function System({ report }: { report: DiagnosticReport }) {
   const { t, lang } = useLang();
   const s = report.snapshot;
-  if (!s) return <p className="mt-4 text-sm text-paper/60">{t.unavailable}</p>;
+  if (!s) return <p className="mt-4 text-sm text-fg/60">{t.unavailable}</p>;
   const gpu = s.gpus.find((g) => g.likelyIntegrated?.isAvailable && g.likelyIntegrated.value === false) ?? s.gpus[0];
   const d = s.displays.find((x) => x.isPrimary) ?? s.displays[0];
   const onoff = (m: Measured<boolean> | undefined) => <Na m={m}>{m?.value ? t.on : t.off}</Na>;
   const rows: [string, React.ReactNode][] = [
-    [t.sys_os, <><Na m={s.os.productName}>{s.os.productName.value}</Na> <span className="text-paper/45"><Na m={s.os.build}>{s.os.build.value}</Na></span></>],
-    [t.sys_cpu, <><Na m={s.cpu.name}>{s.cpu.name.value}</Na> <span className="text-paper/45"><Na m={s.cpu.physicalCores}>{s.cpu.physicalCores.value}</Na>/<Na m={s.cpu.logicalProcessors}>{s.cpu.logicalProcessors.value}</Na></span></>],
-    [t.sys_gpu, gpu ? <><Na m={gpu.name}>{gpu.name.value}</Na> <span className="text-paper/45"><Na m={gpu.dedicatedMemoryBytes}>{fmt((gpu.dedicatedMemoryBytes.value ?? 0) / 1024 ** 3, 0, lang)} GB</Na></span></> : t.unavailable],
+    [t.sys_os, <><Na m={s.os.productName}>{s.os.productName.value}</Na> <span className="text-fg/60"><Na m={s.os.build}>{s.os.build.value}</Na></span></>],
+    [t.sys_cpu, <><Na m={s.cpu.name}>{s.cpu.name.value}</Na> <span className="text-fg/60"><Na m={s.cpu.physicalCores}>{s.cpu.physicalCores.value}</Na>/<Na m={s.cpu.logicalProcessors}>{s.cpu.logicalProcessors.value}</Na></span></>],
+    [t.sys_gpu, gpu ? <><Na m={gpu.name}>{gpu.name.value}</Na> <span className="text-fg/60"><Na m={gpu.dedicatedMemoryBytes}>{fmt((gpu.dedicatedMemoryBytes.value ?? 0) / 1024 ** 3, 0, lang)} GB</Na></span></> : t.unavailable],
     [t.sys_ram, <Na m={s.memory.totalBytes}>{fmt((s.memory.totalBytes.value ?? 0) / 1024 ** 3, 0, lang)} GB · {s.memory.modules.length}×</Na>],
     [t.sys_display, d ? <><Na m={d.width}>{d.width.value}×{d.height.value}</Na> @ <Na m={d.currentRefreshHz}>{d.currentRefreshHz.value} Hz</Na>
       {d.maxRefreshHzAtCurrentResolution?.isAvailable && d.currentRefreshHz?.isAvailable && (d.maxRefreshHzAtCurrentResolution.value ?? 0) > (d.currentRefreshHz.value ?? 0) &&
-        <span className="text-accent"> / max {d.maxRefreshHzAtCurrentResolution.value}</span>}</> : t.unavailable],
+        <span className="text-link"> / max {d.maxRefreshHzAtCurrentResolution.value}</span>}</> : t.unavailable],
     [t.sys_gamemode, onoff(s.settings.gameMode)],
     [t.sys_hags, onoff(s.settings.hardwareAcceleratedGpuScheduling)],
     [t.sys_power, <Na m={s.settings.activePowerScheme}>{s.settings.activePowerScheme.value?.name}</Na>],
@@ -453,7 +454,7 @@ function System({ report }: { report: DiagnosticReport }) {
     <dl className="mt-4">
       {rows.map(([k, v], i) => (
         <div key={k} className={cn("flex gap-3 py-2 text-[13px]", i && "border-t border-white/8")}>
-          <dt className="w-28 shrink-0 text-paper/55">{k}</dt>
+          <dt className="w-28 shrink-0 text-fg/55">{k}</dt>
           <dd className="min-w-0 flex-1 truncate font-bold">{v}</dd>
         </div>
       ))}
@@ -491,19 +492,19 @@ export function PerformanceBento({ report, className }: PerformanceBentoProps) {
         <Tile label={t.t_frametime} className="min-h-[390px] md:col-span-12 lg:col-span-8">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <Title sub={t.t_frametime_sub}>{t.t_frametime} · {gameName(game)}</Title>
-            <div className="flex gap-4 text-[12px] font-bold text-paper/70">
-              <span className="inline-flex items-center gap-1.5"><i className="inline-block size-2 bg-accent" />max</span>
-              <span className="inline-flex items-center gap-1.5"><i className="inline-block h-0.5 w-3 bg-ink ring-1 ring-paper/60" />mean</span>
+            <div className="flex gap-4 text-[12px] font-bold text-fg/70">
+              <span className="inline-flex items-center gap-1.5"><i className="inline-block size-2 bg-link" />max</span>
+              <span className="inline-flex items-center gap-1.5"><i className="inline-block h-0.5 w-3 bg-fg/85" />mean</span>
             </div>
           </div>
           {st && (
             <div className="mt-4 flex flex-wrap items-end gap-x-5 gap-y-2">
               <DotNumber value={st.averageFps} pitch={pitch} label={`${fmt(st.averageFps, 0, lang)} ${t.t_avg_fps}`} />
               <div className="pb-1">
-                <div className="text-[13px] font-bold text-accent tabular">
+                <div className="text-[13px] font-bold text-link tabular">
                   {avgFps ? `${avgFps.deltaPercent >= 0 ? "↑" : "↓"} ${fmt(Math.abs(avgFps.deltaPercent), 1, lang)}% ${t.after.toLowerCase()}` : t.t_avg_fps}
                 </div>
-                <div className="mt-0.5 text-[13px] text-muted-dark">
+                <div className="mt-0.5 text-[13px] text-muted">
                   {fmt(st.frameCount, 0, lang)} {t.frames} · {fmt(st.durationMs / 1000, 0, lang)} s · {latest?.conditions.displayWidth}×{latest?.conditions.displayHeight} @ {latest?.conditions.refreshHz} Hz
                 </div>
               </div>
@@ -541,22 +542,22 @@ export function PerformanceBento({ report, className }: PerformanceBentoProps) {
           <Title sub={t.t_ranges_sub}>{t.t_ranges}</Title>
           {report.comparison && report.comparison.metrics.length > 0
             ? <Ranges metrics={report.comparison.metrics} />
-            : <p className="mt-auto text-sm text-paper/60">{t.t_verdict_none}</p>}
+            : <p className="mt-auto text-sm text-fg/60">{t.t_verdict_none}</p>}
         </Tile>
 
         {/* runs */}
         <Tile label={t.t_runs} className="min-h-[330px] md:col-span-6 lg:col-span-3">
           <Title sub={t.t_runs_sub}>{t.t_runs}</Title>
-          <div className="mt-3 flex gap-3 text-[11.5px] text-paper/75">
-            <span className="inline-flex items-center gap-1.5"><i className="inline-block size-2 bg-paper" />{t.before}</span>
-            <span className="inline-flex items-center gap-1.5"><i className="inline-block size-2 bg-accent" />{t.after}</span>
+          <div className="mt-3 flex gap-3 text-[11.5px] text-fg/75">
+            <span className="inline-flex items-center gap-1.5"><i className="inline-block size-2 bg-steel" />{t.before}</span>
+            <span className="inline-flex items-center gap-1.5"><i className="inline-block size-2 bg-link" />{t.after}</span>
           </div>
           <Runs sessions={sameGame} />
         </Tile>
 
         {/* recommendations */}
         <Tile label={t.t_recs} className="md:col-span-12 lg:col-span-7">
-          <Title>{t.t_recs} <span className="ml-1 font-mono text-[13px] font-bold text-paper/45">{report.recommendations.length}</span></Title>
+          <Title>{t.t_recs} <span className="ml-1 font-mono text-[13px] font-bold text-fg/60">{report.recommendations.length}</span></Title>
           <Recs report={report} />
         </Tile>
 
@@ -567,13 +568,13 @@ export function PerformanceBento({ report, className }: PerformanceBentoProps) {
           <div className="mt-5 border-t border-white/10 pt-4">
             <div className="text-[13px] font-bold">{t.t_changes}</div>
             {report.changes.length === 0
-              ? <p className="mt-1 text-[12.5px] text-paper/55">{t.t_changes_none}</p>
+              ? <p className="mt-1 text-[12.5px] text-fg/55">{t.t_changes_none}</p>
               : (
                 <ul className="mt-2 space-y-2">
                   {report.changes.slice(0, 4).map((c) => (
                     <li key={c.id} className="text-[12px] leading-[17px]">
-                      <div className="truncate font-mono text-paper/80" title={c.target}>{c.target}</div>
-                      <div className="text-paper/50">{c.original} → <span className="text-paper/80">{c.planned}</span> · <span className={c.state === "Verified" ? "text-accent" : "text-muted-dark"}>{t.state[c.state] ?? c.state}</span></div>
+                      <div className="truncate font-mono text-fg/80" title={c.target}>{c.target}</div>
+                      <div className="text-fg/60">{c.original} → <span className="text-fg/80">{c.planned}</span> · <span className={c.state === "Verified" ? "text-link" : "text-muted"}>{t.state[c.state] ?? c.state}</span></div>
                     </li>
                   ))}
                 </ul>
@@ -593,7 +594,7 @@ function GpuBar({ ratio }: { ratio: number | null }) {
     <div className="flex h-[22px] items-end gap-[3px]" aria-hidden="true">
       {Array.from({ length: n }, (_, i) => {
         const on = ratio !== null && i / (n - 1) <= ratio * g;
-        return <i key={i} className="block w-[2px] flex-1" style={{ height: i % 6 === 0 ? 22 : 14, background: on ? VOLT : "rgba(244,246,239,.22)" }} />;
+        return <i key={i} className="block w-[2px] flex-1" style={{ height: i % 6 === 0 ? 22 : 14, background: on ? VOLT : "rgba(255,255,255,.22)" }} />;
       })}
     </div>
   );

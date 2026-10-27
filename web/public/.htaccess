@@ -1,5 +1,7 @@
-# FramePilot static site on Hostinger (Apache / LiteSpeed)
+# TuneFPS static site (tunefps.com) on Hostinger (Apache / LiteSpeed)
 Options -Indexes
+AddType font/woff .woff
+AddType font/woff2 .woff2
 DirectoryIndex index.html
 ErrorDocument 404 /404.html
 
@@ -8,6 +10,8 @@ ErrorDocument 404 /404.html
   RewriteCond %{HTTPS} !=on
   RewriteCond %{HTTP:X-Forwarded-Proto} !https
   RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+  RewriteCond %{HTTP_HOST} ^www\.tunefps\.com$ [NC]
+  RewriteRule ^ https://tunefps.com%{REQUEST_URI} [L,R=301]
 </IfModule>
 
 <IfModule mod_headers.c>
@@ -17,6 +21,9 @@ ErrorDocument 404 /404.html
   Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
   Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'none'"
   <FilesMatch "^app\.[0-9a-f]+\.(js|css)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+  <FilesMatch "\.(woff|woff2)$">
     Header set Cache-Control "public, max-age=31536000, immutable"
   </FilesMatch>
   <FilesMatch "\.html$">

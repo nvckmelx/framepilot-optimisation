@@ -1,63 +1,111 @@
 @import "tailwindcss";
 
-/* FRAMEPILOT brand system 1.0 (docs/brand/FRAMEPILOT_BRAND_MASTER.md) — Frame F / minimal. */
+/* TuneFPS brand 1.0 — values from design-tokens.json (TuneFPS-brand-handoff/02-design-system).
+   Dark only. Tune Blue #007BFF is for the mark and fills; text-bearing buttons use Deep Blue #0066D6,
+   accent text uses #4C9DFF (Tune Blue as small text on Midnight is 4.29:1 and fails). */
+
+/* Display: Archivo Black has no Cyrillic, so Cyrillic falls through to Inter Tight ExtraBold. */
+@font-face {
+  font-family: "TF Display";
+  src: url("/assets/fonts/archivo-black-latin.woff") format("woff");
+  font-weight: 400 900;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2190-21FF, U+2212, U+2215, U+2264-2265;
+}
+@font-face {
+  font-family: "TF Display";
+  src: url("/assets/fonts/inter-tight-800-cyrillic.woff") format("woff");
+  font-weight: 400 900;
+  font-display: swap;
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face { font-family: "Inter"; src: url("/assets/fonts/inter-400.woff") format("woff"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Inter"; src: url("/assets/fonts/inter-500.woff") format("woff"); font-weight: 500; font-display: swap; }
+@font-face { font-family: "Inter"; src: url("/assets/fonts/inter-600.woff") format("woff"); font-weight: 600; font-display: swap; }
+@font-face { font-family: "Inter"; src: url("/assets/fonts/inter-700.woff") format("woff"); font-weight: 700 800; font-display: swap; }
+
 @theme {
-  --color-ink: #101412;
-  --color-paper: #f4f6ef;
-  --color-accent: #cbff4d;
-  --color-muted-light: #586258;
-  --color-muted-dark: #aeb8ae;
-  --color-surface: #1b211d;
-  --color-border-light: #d7ddd3;
-  --color-border-dark: #39413b;
-  /* Interface-only state colour (not part of the brand palette): always paired with text or an icon. */
-  --color-alert: #ff6b5e;
+  /* surfaces */
+  --color-app: #1a1c20; /* Midnight — page */
+  --color-sunken: #111214; /* Carbon — bands, footer, cards */
+  --color-raised: #22252b;
+  --color-line: #2c3038; /* Graphite */
+  --color-line-strong: #3a4049;
+  --color-control: #6e7682;
+  /* text */
+  --color-fg: #ffffff;
+  --color-fg2: #c9cfd6;
+  --color-muted: #9ba3ae;
+  --color-steel: #a3b3c6; /* "fps", labels, the "before" series */
+  --color-link: #4c9dff; /* accent text, focus ring, the "after" series */
+  /* brand blue */
+  --color-blue: #007bff; /* Tune Blue — mark, fills */
+  --color-cta: #0066d6; /* Deep Blue — buttons with text */
+  --color-cta-hover: #0070f0;
+  --color-cta-pressed: #0057b8;
+  /* states — always paired with text or a sign */
+  --color-good: #22c55e;
+  --color-warn: #f59e0b;
+  --color-alert: #f87171;
 
-  --font-sans: Arial, Helvetica, sans-serif;
-  --font-mono: Arial, Helvetica, sans-serif;
+  --font-sans: Inter, "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
+  --font-display: "TF Display", "Inter Tight", "Segoe UI", sans-serif;
+  --font-mono: Inter, "Segoe UI Variable", "Segoe UI", sans-serif;
 
-  --radius-control: 4px;
-  --radius-card: 8px;
-  --ease-brand: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --radius-control: 8px;
+  --radius-card: 12px;
+  --ease-brand: cubic-bezier(0.2, 0, 0, 1);
 }
 
 @layer base {
   html {
-    background: var(--color-paper);
-    color: var(--color-ink);
+    background: var(--color-app);
+    color: var(--color-fg);
+    color-scheme: dark;
     -webkit-font-smoothing: antialiased;
   }
   body {
     font-family: var(--font-sans);
     font-size: 16px;
-    line-height: 1.6;
+    line-height: 1.55;
     min-height: 100dvh;
   }
   h1,
-  h2,
-  h3 {
-    font-weight: 700;
-    letter-spacing: -0.03em;
+  h2 {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-synthesis: none;
+    letter-spacing: -0.01em;
     line-height: 1.08;
   }
+  h3 {
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.25;
+  }
   ::selection {
-    background: var(--color-accent);
-    color: var(--color-ink);
+    background: var(--color-cta);
+    color: #fff;
   }
   :focus-visible {
-    outline: 3px solid currentColor;
-    outline-offset: 4px;
+    outline: 2px solid var(--color-link);
+    outline-offset: 3px;
   }
 }
 
 @utility tabular {
   font-variant-numeric: tabular-nums;
 }
-/* Brand label: Bold 11–12 px, uppercase, 0.12em. Used sparingly. */
+@utility display {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-synthesis: none;
+}
+/* Brand label: Inter SemiBold 12 px, uppercase, 0.1em. */
 @utility label {
   font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
+  font-weight: 600;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 @utility wrap {
@@ -74,19 +122,19 @@
   .tile {
     position: relative;
     border-radius: var(--radius-card);
-    border: 1px solid var(--color-border-dark);
-    background: var(--color-surface);
-    color: var(--color-paper);
+    border: 1px solid var(--color-line);
+    background: var(--color-sunken);
+    color: var(--color-fg);
   }
   .tile-accent {
-    background: var(--color-accent);
-    border-color: var(--color-accent);
-    color: var(--color-ink);
+    background: var(--color-cta);
+    border-color: var(--color-cta);
+    color: #fff;
   }
   .tile-paper {
-    background: var(--color-paper);
-    border-color: var(--color-border-light);
-    color: var(--color-ink);
+    background: var(--color-raised);
+    border-color: var(--color-line-strong);
+    color: var(--color-fg);
   }
   .reveal .tile {
     opacity: 0;
