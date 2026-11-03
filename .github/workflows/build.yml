@@ -27,9 +27,18 @@ jobs:
         run: dotnet build FramePilot.slnx -c Release --no-restore
       - name: Test
         run: dotnet test FramePilot.slnx -c Release --no-build --logger "trx;LogFileName=results.trx" --logger "console;verbosity=normal"
+      - name: Download PresentMon (Intel, MIT)
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          New-Item -ItemType Directory -Force pm | Out-Null
+          gh release download v2.6.0 --repo GameTechDev/PresentMon --pattern "PresentMon-2.6.0-x64.exe" --dir pm
+          Invoke-WebRequest https://raw.githubusercontent.com/GameTechDev/PresentMon/v2.6.0/LICENSE.txt -OutFile pm/LICENSE.txt
+          Get-ChildItem pm
       - name: Publish
         shell: pwsh
-        run: ./build/publish.ps1 -SkipTests
+        run: ./build/publish.ps1 -SkipTests -PresentMon pm/PresentMon-2.6.0-x64.exe -PresentMonLicense pm/LICENSE.txt
       - name: Install Inno Setup
         run: choco install innosetup -y --no-progress
       - name: Installer
@@ -37,12 +46,14 @@ jobs:
         run: |
           & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" "/DSourceDir=$PWD\artifacts\FramePilot" "/DOutputDir=$PWD\artifacts" installer\FramePilot.iss
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          # The 1.0.x download link (and the website before 1.1) points to the old file name: publish both.
+          Copy-Item artifacts/TuneFPS-Setup-x64.exe artifacts/FramePilot-Setup-x64.exe
       - uses: actions/upload-artifact@v4
         with:
-          name: FramePilot
+          name: TuneFPS
           path: |
             artifacts/FramePilot
-            artifacts/FramePilot-Setup-x64.exe
+            artifacts/TuneFPS-Setup-x64.exe
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -54,6 +65,8 @@ jobs:
         with:
           tag_name: ${{ inputs.release_tag || github.ref_name }}
           target_commitish: ${{ github.sha }}
-          name: FramePilot ${{ inputs.release_tag || github.ref_name }}
-          files: artifacts/FramePilot-Setup-x64.exe
+          name: TuneFPS ${{ inputs.release_tag || github.ref_name }}
+          files: |
+            artifacts/TuneFPS-Setup-x64.exe
+            artifacts/FramePilot-Setup-x64.exe
           generate_release_notes: true

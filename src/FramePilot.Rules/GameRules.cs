@@ -11,8 +11,8 @@ public sealed class NvidiaReflexRule : RuleBase
         RiskLevel.None, false, false, RecommendationKind.UserAction, null,
         new[] { Sources.NvidiaReflex, Sources.NvidiaLatencyGuide }, Validated,
         new LocalizedText(
-            "Эффект Reflex зависит от того, упирается ли игра в GPU. FramePilot не меняет настройки внутри игры: проверенного поддерживаемого способа для этого нет.",
-            "Reflex's effect depends on whether the game is GPU-bound. FramePilot does not change in-game settings: there is no verified supported way to do so."));
+            "Эффект Reflex зависит от того, упирается ли игра в GPU. TuneFPS не меняет настройки внутри игры: проверенного поддерживаемого способа для этого нет.",
+            "Reflex's effect depends on whether the game is GPU-bound. TuneFPS does not change in-game settings: there is no verified supported way to do so."));
 
     public override Recommendation? Evaluate(RuleContext ctx)
     {
@@ -75,8 +75,8 @@ public sealed class ValorantSecurityRequirementsRule : RuleBase
         RiskLevel.None, false, false, RecommendationKind.DiagnosticOnly, null,
         new[] { Sources.RiotValorantSupport }, Validated,
         new LocalizedText(
-            "Актуальные требования Vanguard определяет Riot. FramePilot никогда не отключает VBS/HVCI, TPM, Secure Boot, Defender или Firewall.",
-            "Riot defines Vanguard's current requirements. FramePilot never disables VBS/HVCI, TPM, Secure Boot, Defender or Firewall."));
+            "Актуальные требования Vanguard определяет Riot. TuneFPS никогда не отключает VBS/HVCI, TPM, Secure Boot, Defender или Firewall.",
+            "Riot defines Vanguard's current requirements. TuneFPS never disables VBS/HVCI, TPM, Secure Boot, Defender or Firewall."));
 
     public override Recommendation? Evaluate(RuleContext ctx)
     {

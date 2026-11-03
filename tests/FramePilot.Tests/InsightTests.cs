@@ -275,3 +275,23 @@ public class AutoCaptureWatcherTests
         Assert.Equal(GameId.Valorant, w.Poll(t0.AddSeconds(95), delay, enabled: true, busy: false));
     }
 }
+
+public class ReportPrivacyTests
+{
+    [Fact]
+    public void ProcessNames_AreRemovedFromExport_ByDefault()
+    {
+        var frames = Fixtures.Frames(4, 4, 4, 20, 4, 4);
+        var insights = new SessionInsights(new[] { new SpikeAttribution(36, 20, SpikeCause.BackgroundProcess, 38, 3, "MyPrivateApp") },
+            Array.Empty<LagMarker>(), BottleneckClassifier.Classify(frames), BottleneckClassifier.Latency(frames), Array.Empty<string>(), false);
+        var s = new SessionRecord(Guid.NewGuid(), GameId.Cs2, "cs2", DateTimeOffset.Now, 60, RunGroup.Baseline,
+            new TestConditions(null, null, null, null, null, null, null), "PresentMon", "MsBetweenPresents", new[] { "MsBetweenPresents" },
+            MetricCalculator.Compute(frames), null, false, Array.Empty<string>(), null, insights);
+        var report = FramePilot.Reports.ReportBuilder.Build("1.1.0", "ru", null, new[] { s }, Array.Empty<Recommendation>(), null,
+            Array.Empty<FramePilot.Core.Changes.ChangeRecord>());
+        var json = FramePilot.Reports.ReportBuilder.ToJson(report);
+        Assert.DoesNotContain("MyPrivateApp", json);
+        Assert.Contains("backgroundProcess", json, StringComparison.OrdinalIgnoreCase);
+        Assert.Equal("framepilot.report/1", report.Schema);
+    }
+}

@@ -193,7 +193,7 @@ public sealed class SettingsViewModel : ObservableObject, IPage
 
         var dlg = new SaveFileDialog
         {
-            FileName = $"FramePilot-report-{DateTime.Now:yyyyMMdd-HHmm}{(W.IsDemo ? "-DEMO" : "")}.{(json ? "json" : "html")}",
+            FileName = $"TuneFPS-report-{DateTime.Now:yyyyMMdd-HHmm}{(W.IsDemo ? "-DEMO" : "")}.{(json ? "json" : "html")}",
             Filter = json ? "JSON (*.json)|*.json" : "HTML (*.html)|*.html"
         };
         if (dlg.ShowDialog() != true) return;

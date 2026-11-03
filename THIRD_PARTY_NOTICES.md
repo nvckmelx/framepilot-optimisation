@@ -12,12 +12,17 @@ Copyright (c) Eric Sink. Licensed under the Apache License 2.0. https://github.c
 ## SQLite
 Public domain. https://sqlite.org/copyright.html
 
-## Intel PresentMon (not bundled by default)
-FramePilot launches a PresentMon console executable that the user downloads from the official releases page
-(https://github.com/GameTechDev/PresentMon/releases) or that a distributor places into the `tools` folder.
-PresentMon is Copyright (C) Intel Corporation and is licensed under the MIT License. If you redistribute
-PresentMon with FramePilot, include its copyright notice and license text (LICENSE.txt from the PresentMon repository)
-next to the executable.
+## Intel PresentMon 2.6.0 (bundled in tools\PresentMon.exe)
+TuneFPS (formerly FramePilot) launches the PresentMon console application to record frame timing via Windows ETW.
+The official build from https://github.com/GameTechDev/PresentMon/releases/tag/v2.6.0 is shipped unmodified in the
+`tools` folder together with its license text (`tools\PresentMon-LICENSE.txt`).
+PresentMon is Copyright (C) Intel Corporation and is licensed under the MIT License.
 
 ## Fonts
 The brand typeface Manrope (SIL Open Font License 1.1) is used if installed on the system; otherwise Segoe UI is used.
+
+## Fonts: Inter, Inter Tight, Archivo Black
+Embedded in the application and served by the website. Inter and Inter Tight © The Inter Project Authors;
+Archivo Black © The Archivo Black Project Authors. All are licensed under the SIL Open Font License 1.1 (texts in `licenses\OFL-*.txt`).
+The Cyrillic display face is Inter Tight ExtraBold renamed to "TuneFPS Display Cyrillic" (a Modified Version under the OFL;
+no Reserved Font Name is used).

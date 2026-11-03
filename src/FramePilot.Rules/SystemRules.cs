@@ -43,8 +43,8 @@ public sealed class DisplayRefreshRule : RuleBase
             },
             new("Частота не выставлена после установки монитора или драйвера; ограничение кабеля/порта.",
                 "Refresh rate was never raised after installing the monitor or driver; cable or port limitation."),
-            new("Откройте Параметры → Система → Дисплей → Расширенные параметры дисплея и выберите максимальную частоту. FramePilot не меняет режим экрана сам.",
-                "Open Settings → System → Display → Advanced display and choose the highest refresh rate. FramePilot does not change display modes itself."),
+            new("Откройте Параметры → Система → Дисплей → Расширенные параметры дисплея и выберите максимальную частоту. TuneFPS не меняет режим экрана сам.",
+                "Open Settings → System → Display → Advanced display and choose the highest refresh rate. TuneFPS does not change display modes itself."),
             new("После изменения нажмите «Проверить ПК» ещё раз: текущая частота должна совпасть с максимальной.",
                 "After changing it, run the PC check again: the current rate should match the maximum."));
     }
@@ -163,8 +163,8 @@ public sealed class PowerSaverRule : RuleBase
         RiskLevel.Low, false, false, RecommendationKind.UserAction, null,
         new[] { Sources.WindowsGraphicsSettings }, Validated,
         new LocalizedText(
-            "FramePilot не создаёт и не изменяет схемы питания. Режим «Сбалансированный» — нормальный выбор для игр на настольном ПК.",
-            "FramePilot does not create or modify power plans. 'Balanced' is a normal choice for desktop gaming."));
+            "TuneFPS не создаёт и не изменяет схемы питания. Режим «Сбалансированный» — нормальный выбор для игр на настольном ПК.",
+            "TuneFPS does not create or modify power plans. 'Balanced' is a normal choice for desktop gaming."));
 
     public override Recommendation? Evaluate(RuleContext ctx)
     {
@@ -214,8 +214,8 @@ public sealed class MemorySpeedRule : RuleBase
         RiskLevel.None, false, false, RecommendationKind.UserAction, null,
         Array.Empty<SourceRef>(), Validated,
         new LocalizedText(
-            "Windows не сообщает, включён ли XMP/EXPO. Поле Speed может содержать базовую JEDEC-скорость, поэтому вывод предварительный. FramePilot никогда не меняет BIOS.",
-            "Windows does not report whether XMP/EXPO is on. Speed may hold the base JEDEC value, so this is tentative. FramePilot never changes BIOS settings."));
+            "Windows не сообщает, включён ли XMP/EXPO. Поле Speed может содержать базовую JEDEC-скорость, поэтому вывод предварительный. TuneFPS никогда не меняет BIOS.",
+            "Windows does not report whether XMP/EXPO is on. Speed may hold the base JEDEC value, so this is tentative. TuneFPS never changes BIOS settings."));
 
     public override Recommendation? Evaluate(RuleContext ctx)
     {
@@ -282,8 +282,8 @@ public sealed class LowDiskSpaceRule : RuleBase
         RiskLevel.None, false, false, RecommendationKind.UserAction, null,
         Array.Empty<SourceRef>(), Validated,
         new LocalizedText(
-            "FramePilot не удаляет файлы и не чистит кэши — решение об освобождении места за вами.",
-            "FramePilot does not delete files or clear caches — you decide what to free up."));
+            "TuneFPS не удаляет файлы и не чистит кэши — решение об освобождении места за вами.",
+            "TuneFPS does not delete files or clear caches — you decide what to free up."));
 
     public override Recommendation? Evaluate(RuleContext ctx)
     {
@@ -320,8 +320,8 @@ public sealed class OldGpuDriverRule : RuleBase
         RiskLevel.None, false, false, RecommendationKind.DiagnosticOnly, null,
         Array.Empty<SourceRef>(), Validated,
         new LocalizedText(
-            "Дата драйвера — грубый признак. Новый драйвер не гарантирует прирост; FramePilot не скачивает и не устанавливает драйверы.",
-            "Driver date is a rough signal. A newer driver does not guarantee gains; FramePilot does not download or install drivers."));
+            "Дата драйвера — грубый признак. Новый драйвер не гарантирует прирост; TuneFPS не скачивает и не устанавливает драйверы.",
+            "Driver date is a rough signal. A newer driver does not guarantee gains; TuneFPS does not download or install drivers."));
 
     public override Recommendation? Evaluate(RuleContext ctx)
     {
@@ -353,8 +353,8 @@ public sealed class BackgroundCpuRule : RuleBase
         RiskLevel.None, false, false, RecommendationKind.UserAction, null,
         Array.Empty<SourceRef>(), Validated,
         new LocalizedText(
-            "Наблюдение короткое и сделано вне игры. FramePilot никогда не закрывает программы (Discord, OBS, браузер и др.).",
-            "The observation is short and taken outside the game. FramePilot never closes programs (Discord, OBS, browser, etc.)."));
+            "Наблюдение короткое и сделано вне игры. TuneFPS никогда не закрывает программы (Discord, OBS, браузер и др.).",
+            "The observation is short and taken outside the game. TuneFPS never closes programs (Discord, OBS, browser, etc.)."));
 
     private static readonly HashSet<string> Ignore = new(StringComparer.OrdinalIgnoreCase)
     {
