@@ -1,6 +1,6 @@
 /* Demonstration report. Every object is flagged isDemo and the UI labels it "DEMO DATA".
    Statistics are computed with the same definitions as the app (docs/MEASUREMENT_PROTOCOL.md). */
-import type { ComparisonResult, DiagnosticReport, FrameSeries, FrameStats, Measured, MetricComparison, RunGroup, SessionRecord } from "./report";
+import type { ComparisonResult, DiagnosticReport, FrameSeries, FrameStats, Measured, MetricComparison, RunGroup, SessionInsights, SessionRecord, SpikeCause } from "./report";
 
 const D = <T,>(value: T): Measured<T> => ({ value, isAvailable: true, source: "DEMO DATA" });
 const NA = <T,>(reason: string): Measured<T> => ({ value: null, isAvailable: false, source: "DEMO DATA", unavailableReason: reason });
@@ -140,10 +140,11 @@ export function demoReport(): DiagnosticReport {
     metric("SpikePercent", false, (s) => (100 * s.stats.spikeCount) / s.stats.frameCount),
   ];
   const last = sessions[sessions.length - 1];
+  last.insights = demoInsights(latestTimes);
   return {
     schema: "framepilot.report/1",
     generatedAt: new Date(t0 + 3 * 3600000).toISOString(),
-    appVersion: "1.0.0",
+    appVersion: "1.1.0",
     isDemo: true,
     language: "ru",
     snapshot: {
@@ -190,5 +191,34 @@ export function demoReport(): DiagnosticReport {
       { id: "c1", actionId: "windows.windowed-game-optimizations.enable", target: "HKCU\\Software\\Microsoft\\DirectX\\UserGpuPreferences → DirectXUserGlobalSettings", original: "(not set)", planned: "\"SwapEffectUpgradeEnable=1;\"", state: "Verified", updatedAt: new Date(t0 + 30 * 60000).toISOString(), error: null },
     ],
     latestFrames: series(last.id, latestTimes),
+  };
+}
+
+/** Demo spike attribution in the same shape the app exports: causes rotate so every kind is visible. */
+function demoInsights(times: number[]): SessionInsights {
+  const sorted = [...times].sort((a, b) => a - b);
+  const median = sorted[Math.floor(sorted.length / 2)];
+  const kinds: SpikeCause[] = ["VramFull", "BackgroundProcess", "CpuThrottle", "CpuSideFrame"];
+  let t = 0;
+  const spikes = [] as SessionInsights["spikes"];
+  times.forEach((ft) => {
+    t += ft;
+    if (ft <= 2 * median) return;
+    const cause = kinds[spikes.length % kinds.length];
+    const GB = 1024 ** 3;
+    const detail = cause === "VramFull" ? { value: 11.6 * GB, reference: 12 * GB }
+      : cause === "BackgroundProcess" ? { value: 38, reference: 3, processName: null }
+      : cause === "CpuThrottle" ? { value: 71, reference: 112 }
+      : { value: ft * 0.85, reference: ft };
+    spikes.push({ timeMs: t, frameTimeMs: ft, cause, ...detail });
+  });
+  const m = (v: number) => D(v);
+  return {
+    spikes,
+    markers: spikes.length > 1 ? [{ timeMs: spikes[1].timeMs + 180, nearestSpikeTimeMs: spikes[1].timeMs }] : [],
+    bottleneck: { gpuBoundShare: m(0.72), medianCpuBusyMs: m(2.9), medianGpuBusyMs: m(3.6) },
+    latency: { pcLatencyMs: NA("Reflex is off in the demo"), clickToPhotonMs: NA("Reflex is off in the demo"), displayLatencyMs: m(21.4) },
+    unavailableSensors: [],
+    sensorTimingApproximate: false,
   };
 }
