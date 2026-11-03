@@ -132,7 +132,7 @@ internal static class ScreenshotTour
             ErrorReporter.Log("screenshots", ex.ToString());
             code = 3;
         }
-        Current.Shutdown(code);
+        Application.Current.Shutdown(code);
     }
 
     private static void Save(Window window, string path)
