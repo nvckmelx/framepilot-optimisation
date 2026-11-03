@@ -1,4 +1,4 @@
-namespace TuneFPS.App.Localization;
+namespace FramePilot.App.Localization;
 
 /// <summary>All UI strings. A missing Russian string falls back to English, a missing English string to the key.</summary>
 internal static class Strings
