@@ -132,7 +132,6 @@
                     <Border x:Name="Bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="8" Padding="{TemplateBinding Padding}"
                             RenderTransformOrigin="0.5,0.5">
-                        <Border.RenderTransform><ScaleTransform x:Name="Press" /></Border.RenderTransform>
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True" />
                     </Border>
                     <ControlTemplate.Triggers>
@@ -141,8 +140,9 @@
                         </Trigger>
                         <!-- Press feedback (motion: micro 120 ms, scale 0.97) -->
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="Press" Property="ScaleX" Value="0.97" />
-                            <Setter TargetName="Press" Property="ScaleY" Value="0.97" />
+                            <Setter TargetName="Bd" Property="RenderTransform">
+                                <Setter.Value><ScaleTransform ScaleX="0.97" ScaleY="0.97" /></Setter.Value>
+                            </Setter>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter TargetName="Bd" Property="Opacity" Value="0.4" />
