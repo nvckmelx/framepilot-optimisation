@@ -18,6 +18,8 @@ public static class SpikeAttributor
     public const double VramGameShare = 0.95;
     public const double VramAdapterShare = 0.97;
     public const double PagingMinPerSec = 50;
+    /// <summary>Paging counts as "up" above this multiple of the session median (robust when paging is frequent).</summary>
+    public const double PagingMedianFactor = 4;
     public const double CpuLimitBelowPercent = 90;
     public const double CpuFrequencyDropRatio = 0.85;
     public const double BackgroundRisePoints = 15;
@@ -76,7 +78,7 @@ public static class SpikeAttributor
                 if (full && pagingUp) return Make(SpikeCause.VramFull, game ?? adapter, budget);
             }
             // 2. Paging from disk.
-            if (pagingUp) return Make(SpikeCause.Paging, Max(w, s => s.PageReadsPerSec), b.PageReadsP95);
+            if (pagingUp) return Make(SpikeCause.Paging, Max(w, s => s.PageReadsPerSec), b.PageReadsMedian);
             // 3. CPU throttling.
             var limit = Min(w, s => s.CpuPerformanceLimitPercent);
             var perf = Min(w, s => s.CpuPerformancePercent);
@@ -109,7 +111,7 @@ public static class SpikeAttributor
     private static bool IsPagingUp(List<SensorSample> w, Baseline b)
     {
         var reads = Max(w, s => s.PageReadsPerSec);
-        return reads is not null && reads > PagingMinPerSec && reads > (b.PageReadsP95 ?? 0);
+        return reads is not null && reads > PagingMinPerSec && reads > PagingMedianFactor * (b.PageReadsMedian ?? 0);
     }
 
     private static double? Max(IEnumerable<SensorSample> w, Func<SensorSample, double?> f)
@@ -141,7 +143,7 @@ public static class SpikeAttributor
     }
 
     /// <summary>Session-wide reference values the spike windows are compared against.</summary>
-    internal sealed record Baseline(double? PageReadsP95, double? CpuPerformanceMedian, double? OtherCpuMedian, double GpuLimitedShare)
+    internal sealed record Baseline(double? PageReadsMedian, double? CpuPerformanceMedian, double? OtherCpuMedian, double GpuLimitedShare)
     {
         public static Baseline From(IReadOnlyList<SensorSample> s)
         {
@@ -150,12 +152,11 @@ public static class SpikeAttributor
                 var l = xs.Where(x => x is not null).Select(x => x!.Value).OrderBy(x => x).ToList();
                 return l.Count == 0 ? null : MetricCalculator.Median(l);
             }
-            var reads = s.Where(x => x.PageReadsPerSec is not null).Select(x => x.PageReadsPerSec!.Value).OrderBy(x => x).ToList();
             var withReasons = s.Where(x => x.GpuClockReasons is not null).ToList();
             var limitedShare = withReasons.Count == 0 ? 0 :
                 (double)withReasons.Count(x => (x.GpuClockReasons!.Value & GpuLimitReasons) != 0) / withReasons.Count;
             return new Baseline(
-                reads.Count == 0 ? null : MetricCalculator.PercentileNearestRank(reads, 95),
+                Med(s.Select(x => x.PageReadsPerSec)),
                 Med(s.Select(x => x.CpuPerformancePercent)),
                 Med(s.Select(x => x.OtherCpuPercent)),
                 limitedShare);

@@ -4,10 +4,10 @@
         xmlns:vm="clr-namespace:FramePilot.App.ViewModels"
         xmlns:v="clr-namespace:FramePilot.App.Views"
         xmlns:l="clr-namespace:FramePilot.App.Localization"
-        Title="FRAMEPILOT" Width="1320" Height="860" MinWidth="1020" MinHeight="640"
+        Title="TuneFPS" Width="1320" Height="860" MinWidth="1020" MinHeight="640"
         WindowStartupLocation="CenterScreen"
         Background="{StaticResource Bg}" Foreground="{StaticResource Text}"
-        FontFamily="{StaticResource UiFont}" Icon="Assets/app.ico"
+        FontFamily="{DynamicResource UiFont}" Icon="Assets/app.ico"
         UseLayoutRounding="True" TextOptions.TextFormattingMode="Display">
     <Window.Resources>
         <DataTemplate DataType="{x:Type vm:OverviewViewModel}"><v:OverviewView /></DataTemplate>
@@ -18,25 +18,38 @@
         <DataTemplate DataType="{x:Type vm:HistoryViewModel}"><v:HistoryView /></DataTemplate>
         <DataTemplate DataType="{x:Type vm:RecoveryViewModel}"><v:RecoveryView /></DataTemplate>
         <DataTemplate DataType="{x:Type vm:SettingsViewModel}"><v:SettingsView /></DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ComputerPage}">
+            <StackPanel>
+                <ContentControl Content="{Binding Hardware}" Focusable="False" />
+                <ContentControl Content="{Binding Games}" Focusable="False" Margin="0,24,0,0" />
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ChangesPage}">
+            <StackPanel>
+                <ContentControl Content="{Binding History}" Focusable="False" />
+                <ContentControl Content="{Binding Recovery}" Focusable="False" Margin="0,24,0,0" />
+            </StackPanel>
+        </DataTemplate>
     </Window.Resources>
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="250" />
+            <ColumnDefinition Width="216" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
         <!-- Sidebar -->
         <Border Background="{StaticResource Surface}" BorderBrush="{StaticResource Line}" BorderThickness="0,0,1,0">
-            <DockPanel Margin="16,22,16,18">
-                <Image DockPanel.Dock="Top" Source="Assets/logo-wordmark.png" Height="36" HorizontalAlignment="Left"
-                       Margin="4,0,0,28" RenderOptions.BitmapScalingMode="HighQuality"
-                       AutomationProperties.Name="FRAMEPILOT" />
-                <StackPanel DockPanel.Dock="Bottom" Margin="8,12,0,0">
+            <DockPanel Margin="12,20,12,16">
+                <Image DockPanel.Dock="Top" Source="Assets/logo-wordmark.png" Height="26" HorizontalAlignment="Left"
+                       Margin="10,2,0,24" RenderOptions.BitmapScalingMode="HighQuality"
+                       AutomationProperties.Name="TuneFPS" />
+                <StackPanel DockPanel.Dock="Bottom" Margin="10,12,0,0">
+                    <Border Height="1" Background="{StaticResource Line}" Margin="-10,0,0,12" />
                     <TextBlock Style="{StaticResource MutedText}" FontSize="12"
                                Text="{Binding Settings.LicenseStatusText}" TextTrimming="CharacterEllipsis" />
                     <TextBlock Style="{StaticResource MutedText}" FontSize="12">
-                        <Run Text="v" /><Run Text="{Binding Settings.Version, Mode=OneWay}" /><Run Text=" · local-first" />
+                        <Run Text="TuneFPS " /><Run Text="{Binding Settings.Version, Mode=OneWay}" />
                     </TextBlock>
                 </StackPanel>
                 <ItemsControl ItemsSource="{Binding Nav}" KeyboardNavigation.TabNavigation="Continue">
@@ -68,13 +81,19 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <Border Background="{StaticResource Warn}" Padding="24,9"
+            <!-- Demo flag: dashed amber outline, as in the brand book (tf-demo-flag) -->
+            <Border Background="{StaticResource WarnSoft}" BorderBrush="{StaticResource Warn}" BorderThickness="0,0,0,1" Padding="32,8"
                     Visibility="{Binding IsDemo, Converter={StaticResource BoolVis}}">
-                <TextBlock Foreground="{StaticResource Bg}" FontWeight="Bold" Text="{l:T Demo_Banner}" TextWrapping="Wrap" />
+                <StackPanel Orientation="Horizontal">
+                    <Border BorderBrush="{StaticResource Warn}" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,12,0" VerticalAlignment="Center">
+                        <TextBlock Text="DEMO" Foreground="{StaticResource Warn}" FontWeight="SemiBold" FontSize="11" />
+                    </Border>
+                    <TextBlock Foreground="{StaticResource Warn}" Text="{l:T Demo_Banner}" TextWrapping="Wrap" VerticalAlignment="Center" />
+                </StackPanel>
             </Border>
             <ProgressBar Grid.Row="1" IsIndeterminate="True" Visibility="{Binding Workspace.Busy, Converter={StaticResource BoolVis}}" />
             <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
-                <ContentControl Content="{Binding CurrentPage}" Margin="40,32,40,40" MaxWidth="1180" HorizontalAlignment="Stretch" Focusable="False" />
+                <ContentControl Content="{Binding CurrentPage}" Margin="32,24,32,32" MaxWidth="1240" HorizontalAlignment="Stretch" Focusable="False" />
             </ScrollViewer>
         </Grid>
     </Grid>

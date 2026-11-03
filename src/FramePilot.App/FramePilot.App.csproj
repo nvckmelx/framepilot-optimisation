@@ -7,7 +7,7 @@
     <AssemblyName>FramePilot</AssemblyName>
     <ApplicationIcon>Assets\app.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <Product>FramePilot</Product>
+    <Product>TuneFPS</Product>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\FramePilot.Core\FramePilot.Core.csproj" />
@@ -26,6 +26,8 @@
     <Resource Include="Assets\logo-wordmark.png" />
     <Resource Include="Assets\logo-mark.png" />
     <Resource Include="Assets\app.ico" />
+    <Resource Include="Assets\Fonts\*.ttf" />
+    <None Include="Assets\Fonts\OFL-*.txt" CopyToOutputDirectory="PreserveNewest" LinkBase="licenses" />
     <None Include="..\..\THIRD_PARTY_NOTICES.md" Link="THIRD_PARTY_NOTICES.md" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

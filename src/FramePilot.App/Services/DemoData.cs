@@ -62,7 +62,7 @@ public static class DemoData
             var ft = baseMs + (rnd.NextDouble() - 0.5) * jitter;
             if (rnd.NextDouble() < spikeChance) ft *= 2.5 + rnd.NextDouble() * 2;
             t += ft;
-            list.Add(new FrameSample(t, ft, ft * 0.72, ft * 0.85, ft, null, null, "Composed: Copy with GPU GDI", true));
+            list.Add(new FrameSample(t, ft, ft * 0.72, ft * 0.85, ft, null, null, "Composed: Copy with GPU GDI", true, 8.5 + ft * 3.2));
         }
         return list;
     }
@@ -84,10 +84,62 @@ public static class DemoData
         return list;
     }
 
-    private static SessionRecord Make(int seed, List<FrameSample> frames, RunGroup group, TestConditions cond, DateTimeOffset at) =>
-        new(DeterministicGuid(seed), GameId.Cs2, "cs2", at, 60, group, cond, "DEMO DATA (synthetic)", "MsBetweenPresents",
-            new[] { "Application", "MsBetweenPresents", "MsGPUBusy", "MsCPUBusy", "PresentMode" },
-            MetricCalculator.Compute(frames), null, true, new[] { "Synthetic demonstration data" });
+    private static SessionRecord Make(int seed, List<FrameSample> frames, RunGroup group, TestConditions cond, DateTimeOffset at)
+    {
+        var sensors = Sensors(frames, seed);
+        // One "it stuttered here" marker near the second spike of each demo session.
+        var spikeTimes = SpikeTimes(frames);
+        var markers = spikeTimes.Count > 1 ? new[] { spikeTimes[1] + 180 } : Array.Empty<double>();
+        var insights = SpikeAttributor.Analyze(frames, sensors, markers, VramBudget);
+        return new(DeterministicGuid(seed), GameId.Cs2, "cs2", at, 60, group, cond, "DEMO DATA (synthetic)", "MsBetweenPresents",
+            new[] { "Application", "MsBetweenPresents", "MsGPUBusy", "MsCPUBusy", "PresentMode", "DisplayLatency" },
+            MetricCalculator.Compute(frames), null, true, new[] { "Synthetic demonstration data" }, null, insights);
+    }
+
+    public const double VramBudget = 8.0 * 1024 * 1024 * 1024;
+
+    private static List<double> SpikeTimes(IReadOnlyList<FrameSample> frames)
+    {
+        var sorted = frames.Select(f => f.FrameTimeMs).OrderBy(x => x).ToList();
+        var median = MetricCalculator.Median(sorted);
+        return frames.Where(f => f.FrameTimeMs > 2 * median).Select(f => f.TimeMs).ToList();
+    }
+
+    /// <summary>
+    /// Synthetic 10 Hz sensors for a demo session. Around each spike one demonstration cause is injected in turn
+    /// (video memory + paging, background process, CPU throttling, none), so the interface can show every kind of result.
+    /// </summary>
+    public static List<SensorSample> Sensors(IReadOnlyList<FrameSample> frames, int seed)
+    {
+        var rnd = new Random(seed * 7 + 1);
+        var spikes = SpikeTimes(frames);
+        var end = frames.Count == 0 ? 0 : frames[^1].TimeMs;
+        var list = new List<SensorSample>();
+        for (var t = 0.0; t <= end; t += 100)
+        {
+            var near = spikes.Select((s, i) => (s, i)).Where(x => Math.Abs(x.s - t) <= 150).Select(x => (int?)x.i).FirstOrDefault();
+            var kind = near is int k ? k % 4 : -1;
+            var vram = 6.6e9 + rnd.NextDouble() * 2e8;
+            list.Add(new SensorSample(t,
+                kind == 2 ? 71 : 112 + rnd.NextDouble() * 4,
+                kind == 2 ? 74 : 100,
+                21 + rnd.NextDouble() * 4,
+                kind == 1 ? 41 : 3 + rnd.NextDouble() * 2,
+                kind == 1 ? "OneDrive" : "explorer",
+                kind == 1 ? 38 : 1 + rnd.NextDouble(),
+                84 + rnd.NextDouble() * 8,
+                kind == 0 ? 7.9 * 1024 * 1024 * 1024 : vram,
+                (kind == 0 ? 7.95 * 1024 * 1024 * 1024 : vram + 4e8),
+                VramBudget,
+                kind == 0 ? 860 : 2 + rnd.NextDouble() * 6,
+                66 + t / Math.Max(1, end) * 6,
+                182 + rnd.NextDouble() * 8,
+                0));
+        }
+        return list;
+    }
+
+    public static List<SensorSample> SensorsForSession(Guid id) => Sensors(FramesForSession(id), SeedOf(id));
 
     public static Guid DeterministicGuid(int seed)
     {

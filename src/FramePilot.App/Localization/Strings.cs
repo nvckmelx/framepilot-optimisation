@@ -20,8 +20,8 @@ internal static class Strings
         ["Chart_NoData"] = "Нет кадров для отображения",
 
         // nav
-        ["Nav_Overview"] = "Обзор", ["Nav_Hardware"] = "Мой компьютер", ["Nav_Games"] = "Игры", ["Nav_Sessions"] = "Анализ сессий",
-        ["Nav_Recommendations"] = "Рекомендации", ["Nav_History"] = "История изменений", ["Nav_Recovery"] = "Восстановление",
+        ["Nav_Overview"] = "Обзор", ["Nav_Hardware"] = "Компьютер", ["Nav_Games"] = "Игры", ["Nav_Sessions"] = "Замер",
+        ["Nav_Recommendations"] = "План", ["Nav_History"] = "Изменения", ["Nav_Recovery"] = "Восстановление",
         ["Nav_Settings"] = "Настройки",
 
         // overview
@@ -219,8 +219,8 @@ internal static class Strings
         ["Demo_Banner"] = "DEMO DATA — demonstration values are shown, not measurements of your PC. Turn off: Settings → Demo mode.",
         ["Chart_NoData"] = "No frames to display",
 
-        ["Nav_Overview"] = "Overview", ["Nav_Hardware"] = "Hardware", ["Nav_Games"] = "Games", ["Nav_Sessions"] = "Sessions",
-        ["Nav_Recommendations"] = "Recommendations", ["Nav_History"] = "Change history", ["Nav_Recovery"] = "Recovery", ["Nav_Settings"] = "Settings",
+        ["Nav_Overview"] = "Overview", ["Nav_Hardware"] = "PC", ["Nav_Games"] = "Games", ["Nav_Sessions"] = "Measure",
+        ["Nav_Recommendations"] = "Plan", ["Nav_History"] = "Changes", ["Nav_Recovery"] = "Recovery", ["Nav_Settings"] = "Settings",
 
         ["Overview_ReadyHeadline"] = "Your PC is ready to be checked",
         ["Overview_NothingFound"] = "No applicable recommendations found",
