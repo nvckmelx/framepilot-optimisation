@@ -6,6 +6,7 @@
     <Project Path="src/FramePilot.Inventory/FramePilot.Inventory.csproj" />
     <Project Path="src/FramePilot.GameAdapters/FramePilot.GameAdapters.csproj" />
     <Project Path="src/FramePilot.Telemetry/FramePilot.Telemetry.csproj" />
+    <Project Path="src/FramePilot.Sensors/FramePilot.Sensors.csproj" />
     <Project Path="src/FramePilot.Optimization/FramePilot.Optimization.csproj" />
     <Project Path="src/FramePilot.Storage/FramePilot.Storage.csproj" />
     <Project Path="src/FramePilot.Reports/FramePilot.Reports.csproj" />

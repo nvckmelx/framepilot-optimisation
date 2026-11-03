@@ -17,7 +17,7 @@ public sealed class RegistryValueTarget : ISettingTarget
     public RegistryValueTarget(string subKey, string valueName, SettingValueKind kind, string description)
     {
         if (!RegistryAllowlist.IsAllowed(subKey))
-            throw new UnauthorizedAccessException($"Registry location is not on the FramePilot allowlist: {subKey}");
+            throw new UnauthorizedAccessException($"Registry location is not on the TuneFPS allowlist: {subKey}");
         if (kind is not (SettingValueKind.String or SettingValueKind.DWord))
             throw new ArgumentOutOfRangeException(nameof(kind));
         SubKey = subKey;

@@ -3,10 +3,10 @@
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Version>1.0.1</Version>
-    <Company>FramePilot</Company>
-    <Product>FramePilot</Product>
-    <Copyright>© 2026 FramePilot</Copyright>
+    <Version>1.1.0</Version>
+    <Company>TuneFPS</Company>
+    <Product>TuneFPS</Product>
+    <Copyright>© 2026 TuneFPS</Copyright>
     <Deterministic>true</Deterministic>
     <InvariantGlobalization>false</InvariantGlobalization>
     <SatelliteResourceLanguages>en;ru</SatelliteResourceLanguages>

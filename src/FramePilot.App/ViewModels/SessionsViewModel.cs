@@ -45,7 +45,11 @@ public sealed class SessionsViewModel : ObservableObject, IPage
     private bool _capturing;
     private ComparisonResult? _comparison;
     private readonly DispatcherTimer _timer;
+    private readonly DispatcherTimer _autoTimer;
+    private readonly AutoCaptureWatcher _watcher = new(GameCatalog.ProcessId);
     private DateTime _captureStart;
+    private int _activeSeconds;
+    private IReadOnlyList<string> _liveLines = Array.Empty<string>();
 
     private Workspace W => _main.Workspace;
 
@@ -67,9 +71,21 @@ public sealed class SessionsViewModel : ObservableObject, IPage
         _timer.Tick += (_, _) =>
         {
             var el = (DateTime.Now - _captureStart).TotalSeconds;
-            CaptureProgress = Math.Min(100, 100 * el / Math.Max(1, _seconds));
-            CaptureStatus = Loc.F("Capture_Recording", (int)el, _seconds);
+            CaptureProgress = Math.Min(100, 100 * el / Math.Max(1, _activeSeconds));
+            CaptureStatus = Loc.F("Capture_Recording", (int)el, _activeSeconds);
+            LiveLines = BuildLiveLines();
         };
+        // Automatic capture (off by default): checks every 2 s whether CS2/VALORANT has been running long enough.
+        _autoTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
+        _autoTimer.Tick += async (_, _) =>
+        {
+            var s = W.App.Settings;
+            var enabled = s.AutoCapture && !W.IsDemo && !W.App.IsDesignPreview && W.Capture.PresentMonPath is not null &&
+                          CaptureService.CanTraceWithoutElevation();
+            var game = _watcher.Poll(DateTimeOffset.Now, TimeSpan.FromSeconds(s.AutoCaptureDelaySeconds), enabled, _capturing || W.Busy);
+            if (game is GameId g) await AutoCaptureAsync(g);
+        };
+        _autoTimer.Start();
         W.Sessions.CollectionChanged += (_, _) => RebuildItems();
         W.Changed += (_, _) => { Raise(nameof(GameName)); Raise(nameof(PresentMonMissing)); };
         Loc.Instance.LanguageChanged += (_, _) => { RebuildItems(); Raise(nameof(Metrics)); Compare(); };
@@ -122,6 +138,69 @@ public sealed class SessionsViewModel : ObservableObject, IPage
     }
 
     public string? CaptureStatus { get => _captureStatus; private set => Set(ref _captureStatus, value); }
+
+    /// <summary>Live sensor readout while recording (spec §3.1); updated 4× per second.</summary>
+    public IReadOnlyList<string> LiveLines { get => _liveLines; private set => Set(ref _liveLines, value); }
+
+    private IReadOnlyList<string> BuildLiveLines()
+    {
+        var s = W.Capture.LiveSensors;
+        var list = new List<string>();
+        string F(string key, params object?[] a) => string.Format(System.Globalization.CultureInfo.CurrentCulture, Loc.T(key), a);
+        if (s is not null)
+        {
+            if (s.CpuPerformancePercent is double cpu) list.Add(F("Live_Cpu", cpu, s.CpuPerformanceLimitPercent ?? 100));
+            if (s.GameGpuPercent is double gpu) list.Add(F("Live_Gpu", gpu));
+            if (s.GameVramBytes is double vr) list.Add(F("Live_Vram", vr / 1073741824.0, (s.VramBudgetBytes ?? 0) / 1073741824.0));
+            if (s.PageReadsPerSec is double pg) list.Add(F("Live_Paging", pg));
+            if (s.OtherCpuPercent is double oc) list.Add(F("Live_Other", oc, s.TopOtherProcess ?? "—"));
+            if (s.GpuTemperatureC is double t) list.Add(F("Live_Temp", t, s.GpuPowerW ?? 0));
+        }
+        list.Add(F("Live_Markers", W.Capture.MarkerCount));
+        return list;
+    }
+
+    public SessionInsights? SelectedInsights =>
+        _selected is null ? null : _selected.Session.Insights ?? SpikeAttributor.Analyze(_frames, CaptureService.LoadSensors(_selected.Session), Array.Empty<double>());
+
+    public Guid SelectedId => _selected?.Session.Id ?? Guid.Empty;
+
+    private async Task AutoCaptureAsync(GameId game)
+    {
+        Capturing = true;
+        _activeSeconds = 60;
+        _captureStart = DateTime.Now;
+        CaptureProgress = 0;
+        CaptureStatus = Loc.F("Capture_AutoStarted", GameCatalog.DisplayName(game));
+        _timer.Start();
+        CaptureResult result;
+        try
+        {
+            result = await W.Capture.CaptureAsync(game, 60, RunGroup.Unlabeled, Loc.T("Capture_AutoNote"), W.Snapshot, elevated: false);
+        }
+        catch (Exception ex)
+        {
+            ErrorReporter.Log("autocapture", ex.ToString());
+            result = new CaptureResult(null, Telemetry.CaptureStatus.Failed, ex.Message);
+        }
+        finally
+        {
+            _timer.Stop();
+            Capturing = false;
+            CaptureProgress = 0;
+        }
+        if (result.Session is not null)
+        {
+            W.AddSession(result.Session);
+            CaptureStatus = Loc.F("Capture_Done", result.Session.Stats.FrameCount);
+        }
+        else
+        {
+            // Never interrupt the game with a dialog: the result is only shown on this page and in the log.
+            CaptureStatus = Loc.T("CaptureStatus_" + result.Status) + (result.Message is null ? "" : " — " + result.Message);
+            W.App.Store.Audit("autocapture", CaptureStatus);
+        }
+    }
     public double CaptureProgress { get => _captureProgress; private set => Set(ref _captureProgress, value); }
 
     public SessionItem? Selected
@@ -225,13 +304,18 @@ public sealed class SessionsViewModel : ObservableObject, IPage
 
     private void LoadFrames()
     {
-        if (_selected is null) { Frames = Array.Empty<FrameSample>(); return; }
-        try { Frames = CaptureService.LoadFrames(_selected.Session); }
-        catch (Exception ex)
+        if (_selected is null) Frames = Array.Empty<FrameSample>();
+        else
         {
-            ErrorReporter.Log("frames", ex.Message);
-            Frames = Array.Empty<FrameSample>();
+            try { Frames = CaptureService.LoadFrames(_selected.Session); }
+            catch (Exception ex)
+            {
+                ErrorReporter.Log("frames", ex.Message);
+                Frames = Array.Empty<FrameSample>();
+            }
         }
+        Raise(nameof(SelectedInsights));
+        Raise(nameof(SelectedId));
     }
 
     private async Task StartAsync()
@@ -255,6 +339,7 @@ public sealed class SessionsViewModel : ObservableObject, IPage
         if (W.Snapshot is null) await W.RunInventoryAsync();
 
         Capturing = true;
+        _activeSeconds = Seconds;
         _captureStart = DateTime.Now;
         CaptureProgress = 0;
         CaptureStatus = Loc.T("Capture_Starting");

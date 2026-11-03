@@ -75,6 +75,36 @@ public sealed class SettingsViewModel : ObservableObject, IPage
         }
     }
 
+    public bool MarkerSound
+    {
+        get => App.Settings.MarkerSound;
+        set { App.Settings.MarkerSound = value; Raise(); }
+    }
+
+    public bool MarkerHotkeyBusy => !MainWindow.MarkerHotkeyAvailable;
+
+    /// <summary>Automatic capture needs tracing without a UAC prompt (Performance Log Users or an elevated session).</summary>
+    public bool CanAutoCapture => Services.CaptureService.CanTraceWithoutElevation();
+
+    public bool AutoCapture
+    {
+        get => App.Settings.AutoCapture && CanAutoCapture;
+        set { App.Settings.AutoCapture = value; Raise(); }
+    }
+
+    public string AutoCaptureHint => Loc.T(CanAutoCapture ? "Set_AutoHint" : "Set_AutoNeedsGroup");
+
+    public sealed record DelayOption(int Seconds, string Label, bool Selected);
+
+    public IReadOnlyList<DelayOption> AutoDelayItems =>
+        new[] { 60, 90, 120, 180, 300 }.Select(s => new DelayOption(s, Loc.F("Set_SecondsN", s), s == App.Settings.AutoCaptureDelaySeconds)).ToList();
+
+    private ICommand? _setAutoDelay;
+    public ICommand SetAutoDelayCommand => _setAutoDelay ??= new RelayCommand(p =>
+    {
+        if (p is int s) { App.Settings.AutoCaptureDelaySeconds = s; Raise(nameof(AutoDelayItems)); }
+    });
+
     public bool ElevatedCapture
     {
         get => App.Settings.ElevatedCapture;
@@ -163,7 +193,7 @@ public sealed class SettingsViewModel : ObservableObject, IPage
 
         var dlg = new SaveFileDialog
         {
-            FileName = $"FramePilot-report-{DateTime.Now:yyyyMMdd-HHmm}{(W.IsDemo ? "-DEMO" : "")}.{(json ? "json" : "html")}",
+            FileName = $"TuneFPS-report-{DateTime.Now:yyyyMMdd-HHmm}{(W.IsDemo ? "-DEMO" : "")}.{(json ? "json" : "html")}",
             Filter = json ? "JSON (*.json)|*.json" : "HTML (*.html)|*.html"
         };
         if (dlg.ShowDialog() != true) return;

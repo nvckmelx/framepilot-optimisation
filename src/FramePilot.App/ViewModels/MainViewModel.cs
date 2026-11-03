@@ -41,6 +41,8 @@ public sealed class MainViewModel : ObservableObject
     public HistoryViewModel History { get; }
     public RecoveryViewModel Recovery { get; }
     public SettingsViewModel Settings { get; }
+    public ComputerPage Computer { get; }
+    public ChangesPage Changes { get; }
     public IReadOnlyList<NavItem> Nav { get; }
     public ICommand NavigateCommand { get; }
 
@@ -55,18 +57,18 @@ public sealed class MainViewModel : ObservableObject
         History = new HistoryViewModel(this);
         Recovery = new RecoveryViewModel(this);
         Settings = new SettingsViewModel(this);
+        Computer = new ComputerPage(Hardware, Games);
+        Changes = new ChangesPage(History, Recovery);
 
-        // Icon geometry: simple 24×24 stroke paths drawn for FramePilot.
+        // Six sections grouped by task (spec 2026-11-04 §4). Icons: 24×24 stroke paths.
         Nav = new[]
         {
             new NavItem("Nav_Overview", "M3,12 L12,4 L21,12 M6,10 V20 H18 V10", Overview),
-            new NavItem("Nav_Hardware", "M4,5 H20 V15 H4 Z M9,19 H15 M12,15 V19", Hardware),
-            new NavItem("Nav_Games", "M6,9 H18 A3,3 0 0 1 21,12 V14 A3,3 0 0 1 15,16 L14,15 H10 L9,16 A3,3 0 0 1 3,14 V12 A3,3 0 0 1 6,9 Z M7,12 H10 M8.5,10.5 V13.5", Games),
-            new NavItem("Nav_Sessions", "M3,17 L8,11 L12,14 L17,7 L21,10 M3,20 H21", Sessions),
-            new NavItem("Nav_Recommendations", "M12,3 L14.5,9 L21,9.5 L16,13.5 L17.5,20 L12,16.5 L6.5,20 L8,13.5 L3,9.5 L9.5,9 Z", Recommendations),
-            new NavItem("Nav_History", "M12,7 V12 L15,14 M3.5,12 A8.5,8.5 0 1 0 6,6 M3,3 V7 H7", History),
-            new NavItem("Nav_Recovery", "M4,12 A8,8 0 1 1 7,18 M4,12 L1.5,9.5 M4,12 L6.5,9.5", Recovery),
-            new NavItem("Nav_Settings", "M12,8 A4,4 0 1 1 11.99,8 M12,2 V5 M12,19 V22 M2,12 H5 M19,12 H22 M4.9,4.9 L7,7 M17,17 L19.1,19.1 M4.9,19.1 L7,17 M17,7 L19.1,4.9", Settings)
+            new NavItem("Nav_Sessions", "M12,8 V12 L15,14 M12,21 A9,9 0 1 0 12,3 A9,9 0 0 0 12,21", Sessions),
+            new NavItem("Nav_Recommendations", "M9,6 H20 M9,12 H20 M9,18 H20 M4,6 L5,7 L7,5 M4,12 L5,13 L7,11 M4,18 H6", Recommendations),
+            new NavItem("Nav_History", "M4,12 A8,8 0 1 1 7,18.2 M4,12 L1.5,9.5 M4,12 L6.5,9.5", Changes),
+            new NavItem("Nav_Hardware", "M4,5 H20 V15 H4 Z M9,19 H15 M12,15 V19", Computer),
+            new NavItem("Nav_Settings", "M12,9 A3,3 0 1 0 12,15 A3,3 0 1 0 12,9 M12,2 V5 M12,19 V22 M2,12 H5 M19,12 H22 M5,5 L7,7 M17,17 L19,19 M5,19 L7,17 M17,7 L19,5", Settings)
         };
         NavigateCommand = new RelayCommand(p => { if (p is NavItem n) Navigate(n.Page); });
         _currentPage = Overview;
@@ -89,6 +91,9 @@ public sealed class MainViewModel : ObservableObject
 
     public void Navigate(object page)
     {
+        // Pages that now live inside a combined section open that section.
+        if (ReferenceEquals(page, Hardware) || ReferenceEquals(page, Games)) page = Computer;
+        else if (ReferenceEquals(page, History) || ReferenceEquals(page, Recovery)) page = Changes;
         CurrentPage = page;
         foreach (var n in Nav) n.IsSelected = ReferenceEquals(n.Page, page);
         if (page is IPage p) p.OnNavigatedTo();
@@ -110,4 +115,22 @@ public sealed class MainViewModel : ObservableObject
 public interface IPage
 {
     void OnNavigatedTo();
+}
+
+/// <summary>"Компьютер": hardware inventory and detected games on one page.</summary>
+public sealed class ComputerPage : IPage
+{
+    public ComputerPage(HardwareViewModel hardware, GamesViewModel games) { Hardware = hardware; Games = games; }
+    public HardwareViewModel Hardware { get; }
+    public GamesViewModel Games { get; }
+    public void OnNavigatedTo() { Hardware.OnNavigatedTo(); Games.OnNavigatedTo(); }
+}
+
+/// <summary>"Изменения": the change journal and recovery tools on one page.</summary>
+public sealed class ChangesPage : IPage
+{
+    public ChangesPage(HistoryViewModel history, RecoveryViewModel recovery) { History = history; Recovery = recovery; }
+    public HistoryViewModel History { get; }
+    public RecoveryViewModel Recovery { get; }
+    public void OnNavigatedTo() { History.OnNavigatedTo(); Recovery.OnNavigatedTo(); }
 }

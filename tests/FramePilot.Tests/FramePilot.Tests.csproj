@@ -18,6 +18,7 @@
     <ProjectReference Include="..\..\src\FramePilot.Rules\FramePilot.Rules.csproj" />
     <ProjectReference Include="..\..\src\FramePilot.Optimization\FramePilot.Optimization.csproj" />
     <ProjectReference Include="..\..\src\FramePilot.Telemetry\FramePilot.Telemetry.csproj" />
+    <ProjectReference Include="..\..\src\FramePilot.Sensors\FramePilot.Sensors.csproj" />
     <ProjectReference Include="..\..\src\FramePilot.GameAdapters\FramePilot.GameAdapters.csproj" />
     <ProjectReference Include="..\..\src\FramePilot.Storage\FramePilot.Storage.csproj" />
     <ProjectReference Include="..\..\src\FramePilot.Reports\FramePilot.Reports.csproj" />

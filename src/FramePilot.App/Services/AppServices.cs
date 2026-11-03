@@ -59,6 +59,18 @@ public sealed class AppSettings
     }
 
     public string? LicenseKey { get => Get("license.key"); set => Put("license.key", value); }
+
+    /// <summary>Short system sound when a lag marker is set (Ctrl+Shift+F9).</summary>
+    public bool MarkerSound { get => Get("marker.sound") != "0"; set => Put("marker.sound", value ? "1" : "0"); }
+
+    /// <summary>Record 60 s automatically after CS2 or VALORANT starts. Off by default.</summary>
+    public bool AutoCapture { get => Get("autocapture") == "1"; set => Put("autocapture", value ? "1" : "0"); }
+
+    public int AutoCaptureDelaySeconds
+    {
+        get => int.TryParse(Get("autocapture.delay"), out var s) && s is >= 30 and <= 900 ? s : 120;
+        set => Put("autocapture.delay", Math.Clamp(value, 30, 900).ToString(CultureInfo.InvariantCulture));
+    }
 }
 
 /// <summary>Composition root. Created once at startup.</summary>
@@ -78,9 +90,19 @@ public sealed class AppServices
     public RecoveryReport? StartupRecovery { get; set; }
     public string AppVersion { get; } = typeof(AppServices).Assembly.GetName().Version?.ToString(3) ?? "1.0.0";
 
-    public AppServices()
+    /// <summary>
+    /// True when started with --design-preview: a separate data folder with demo data only. Capture and applying
+    /// changes are refused by the services themselves, not just hidden in the interface.
+    /// </summary>
+    public bool IsDesignPreview { get; }
+
+    public AppServices(bool designPreview = false)
     {
-        DataDirectory = FramePilotStore.DefaultDataDirectory;
+        IsDesignPreview = designPreview;
+        // The data folder name is kept from 1.0.x: it holds the change journal that rollback depends on.
+        DataDirectory = designPreview
+            ? Path.Combine(FramePilotStore.DefaultDataDirectory, "design-preview")
+            : FramePilotStore.DefaultDataDirectory;
         SessionsDirectory = Path.Combine(DataDirectory, "sessions");
         LogsDirectory = Path.Combine(DataDirectory, "logs");
         Directory.CreateDirectory(SessionsDirectory);
@@ -88,6 +110,7 @@ public sealed class AppServices
 
         Store = new FramePilotStore(Path.Combine(DataDirectory, "framepilot.db"));
         Settings = new AppSettings(Store);
+        if (designPreview) Settings.DemoMode = true;
         Changes = new ChangeEngine(Store, new RegistryTargetResolver());
         Actions = ActionRegistry.Create(new RegistryTargetFactory());
         MachineCode = LicenseVerifier.MachineCodeFrom(ReadMachineGuid());

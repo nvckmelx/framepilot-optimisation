@@ -72,7 +72,7 @@ public class PresentMonRunnerTests
         Assert.Equal(new[]
         {
             "--process_name", "cs2.exe", "--output_file", @"C:\Data\s.csv", "--timed", "120", "--terminate_after_timed",
-            "--terminate_on_proc_exit", "--stop_existing_session", "--session_name", "FramePilotCapture", "--no_console_stats"
+            "--terminate_on_proc_exit", "--stop_existing_session", "--session_name", "FramePilotCapture", "--no_console_stats", "--qpc_time"
         }, args);
     }
 

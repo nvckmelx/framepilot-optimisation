@@ -9,10 +9,10 @@ public abstract class SessionRuleBase : RuleBase
         ctx.LatestSession is { } s && s.IsDemo == ctx.Snapshot.IsDemo && s.Game == ctx.TargetGame ? s : null;
 
     protected static Evidence Fps(SessionRecord s) =>
-        Ev("Средний FPS", "Average FPS", Fmt.N(s.Stats.AverageFps, "0"), "PresentMon → FramePilot metrics");
+        Ev("Средний FPS", "Average FPS", Fmt.N(s.Stats.AverageFps, "0"), "PresentMon → TuneFPS metrics");
 
     protected static Evidence P99(SessionRecord s) =>
-        Ev("P99 времени кадра", "P99 frame time", Fmt.N(s.Stats.P99FrameTimeMs, "0.00") + " ms", "PresentMon → FramePilot metrics");
+        Ev("P99 времени кадра", "P99 frame time", Fmt.N(s.Stats.P99FrameTimeMs, "0.00") + " ms", "PresentMon → TuneFPS metrics");
 
     protected static int? Refresh(SessionRecord s) => s.Conditions.RefreshHz;
 
@@ -149,9 +149,9 @@ public sealed class FrameTimeSpikesRule : SessionRuleBase
             new[]
             {
                 Fps(s), P99(s),
-                Ev("Медиана времени кадра", "Median frame time", Fmt.N(st.MedianFrameTimeMs, "0.00") + " ms", "FramePilot metrics"),
-                Ev("Кадров длиннее 2× медианы", "Frames longer than 2× median", $"{st.SpikeCount} ({Fmt.Pct(spikePct)})", "FramePilot metrics"),
-                Ev("1% low", "1% low", Fmt.N(st.OnePercentLowFps, "0") + " FPS", "FramePilot metrics")
+                Ev("Медиана времени кадра", "Median frame time", Fmt.N(st.MedianFrameTimeMs, "0.00") + " ms", "TuneFPS metrics"),
+                Ev("Кадров длиннее 2× медианы", "Frames longer than 2× median", $"{st.SpikeCount} ({Fmt.Pct(spikePct)})", "TuneFPS metrics"),
+                Ev("1% low", "1% low", Fmt.N(st.OnePercentLowFps, "0") + " FPS", "TuneFPS metrics")
             },
             new("Компиляция шейдеров, фоновые задачи, подгрузка с диска, нехватка памяти, оверлеи.",
                 "Shader compilation, background tasks, disk streaming, memory pressure, overlays."),

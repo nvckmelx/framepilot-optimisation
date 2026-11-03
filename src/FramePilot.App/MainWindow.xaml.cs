@@ -9,9 +9,10 @@ namespace FramePilot.App;
 public partial class MainWindow : Window
 {
     private const int HotkeyId = 0x4650; // "FP"
+    private const int MarkerHotkeyId = 0x4651;
     private const int WM_HOTKEY = 0x0312;
     private const uint MOD_CONTROL = 0x0002, MOD_SHIFT = 0x0004, MOD_NOREPEAT = 0x4000;
-    private const uint VK_F10 = 0x79;
+    private const uint VK_F10 = 0x79, VK_F9 = 0x78;
     private HwndSource? _source;
 
     [DllImport("user32.dll", SetLastError = true)]
@@ -19,6 +20,9 @@ public partial class MainWindow : Window
 
     [DllImport("user32.dll", SetLastError = true)]
     private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
+
+    /// <summary>False when another program already registered Ctrl+Shift+F9.</summary>
+    public static bool MarkerHotkeyAvailable { get; private set; } = true;
 
     public MainWindow()
     {
@@ -34,12 +38,15 @@ public partial class MainWindow : Window
         _source?.AddHook(WndProc);
         // Global hotkey Ctrl+Shift+F10 stops an in-progress measurement while the game has focus.
         RegisterHotKey(handle, HotkeyId, MOD_CONTROL | MOD_SHIFT | MOD_NOREPEAT, VK_F10);
+        // Ctrl+Shift+F9 sets an "it stuttered here" marker during a measurement. If another program owns it, say so in Settings.
+        MarkerHotkeyAvailable = RegisterHotKey(handle, MarkerHotkeyId, MOD_CONTROL | MOD_SHIFT | MOD_NOREPEAT, VK_F9);
     }
 
     protected override void OnClosed(EventArgs e)
     {
         var handle = new WindowInteropHelper(this).Handle;
         UnregisterHotKey(handle, HotkeyId);
+        UnregisterHotKey(handle, MarkerHotkeyId);
         _source?.RemoveHook(WndProc);
         if (DataContext is MainViewModel vm && vm.Workspace.Capture.IsCapturing) vm.Workspace.Capture.RequestStop();
         base.OnClosed(e);
@@ -50,6 +57,12 @@ public partial class MainWindow : Window
         if (msg == WM_HOTKEY && wParam.ToInt32() == HotkeyId && DataContext is MainViewModel vm)
         {
             if (vm.Sessions.StopCommand.CanExecute(null)) vm.Sessions.StopCommand.Execute(null);
+            handled = true;
+        }
+        else if (msg == WM_HOTKEY && wParam.ToInt32() == MarkerHotkeyId && DataContext is MainViewModel mvm)
+        {
+            if (mvm.Workspace.Capture.AddMarker() && mvm.Workspace.App.Settings.MarkerSound)
+                System.Media.SystemSounds.Asterisk.Play();
             handled = true;
         }
         return IntPtr.Zero;

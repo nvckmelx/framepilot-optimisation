@@ -178,6 +178,11 @@ public sealed class RecommendationsViewModel : ObservableObject, IPage
 
     private async Task ApplyAsync()
     {
+        if (W.IsDemo || W.App.IsDesignPreview)
+        {
+            DialogWindow.Show(Loc.T("Plan_Title"), Loc.T("Plan_DemoBlocked"), DialogKind.Info);
+            return;
+        }
         if (!Entitlements.CanAutoApply(W.App.License))
         {
             DialogWindow.Show(Loc.T("Plan_ProTitle"), Loc.T("Plan_ProBody"), DialogKind.Info);

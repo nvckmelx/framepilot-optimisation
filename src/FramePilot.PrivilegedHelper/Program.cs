@@ -51,7 +51,7 @@ public static class Program
 
         using var cls = new ManagementClass(scope, new ManagementPath("SystemRestore"), null);
         using var inParams = cls.GetMethodParameters("CreateRestorePoint");
-        inParams["Description"] = "FramePilot: before applying changes";
+        inParams["Description"] = "TuneFPS: before applying changes";
         inParams["RestorePointType"] = 12u;  // MODIFY_SETTINGS
         inParams["EventType"] = 100u;        // BEGIN_SYSTEM_CHANGE
         using var result = cls.InvokeMethod("CreateRestorePoint", inParams, null);

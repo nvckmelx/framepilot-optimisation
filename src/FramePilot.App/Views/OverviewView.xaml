@@ -1,60 +1,259 @@
 <UserControl x:Class="FramePilot.App.Views.OverviewView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:l="clr-namespace:FramePilot.App.Localization">
-    <StackPanel>
-        <TextBlock Style="{StaticResource Eyebrow}" Text="{l:T Nav_Overview}" />
-        <TextBlock Style="{StaticResource H1}" Text="{Binding Headline}" Margin="0,0,0,6" />
-        <TextBlock Style="{StaticResource MutedText}" Text="{l:T Overview_Sub}" Margin="0,0,0,24" MaxWidth="760" HorizontalAlignment="Left" />
+             xmlns:l="clr-namespace:FramePilot.App.Localization"
+             xmlns:c="clr-namespace:FramePilot.App.Controls">
+    <UserControl.Resources>
+        <Style x:Key="KpiCell" TargetType="Border">
+            <Setter Property="BorderBrush" Value="{StaticResource Line}" />
+            <Setter Property="BorderThickness" Value="1,0,0,0" />
+            <Setter Property="Padding" Value="24,0,12,0" />
+        </Style>
+        <Style x:Key="KpiLabel" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource Text2}" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Margin" Value="0,8,0,0" />
+        </Style>
+        <Style x:Key="KpiSub" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource Muted}" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Margin" Value="0,2,0,0" />
+            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+        </Style>
+    </UserControl.Resources>
 
-        <Grid>
+    <StackPanel>
+        <!-- Header: what this is and the one main action -->
+        <Grid Margin="0,0,0,14">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel>
+                <TextBlock Style="{StaticResource Display}" Text="{Binding SessionTitle}" />
+                <TextBlock Style="{StaticResource MutedText}" Text="{Binding SessionLine}" Margin="0,4,0,0" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Bottom">
+                <Button Command="{Binding CheckCommand}" Content="{l:T Overview_Check}" />
+                <Button Style="{StaticResource PrimaryButton}" Command="{Binding MeasureCommand}" Content="{l:T Overview_NewMeasure}" Margin="0" />
+            </StackPanel>
+        </Grid>
+
+        <!-- Game and goal -->
+        <WrapPanel Margin="0,0,0,14">
+            <RadioButton Style="{StaticResource Segment}" GroupName="ovgame" Content="Counter-Strike 2" IsChecked="{Binding IsCs2, Mode=TwoWay}" />
+            <RadioButton Style="{StaticResource Segment}" GroupName="ovgame" Content="VALORANT" IsChecked="{Binding IsValorant, Mode=TwoWay}" Margin="0,0,18,6" />
+            <RadioButton Style="{StaticResource Segment}" GroupName="ovgoal" Content="{l:T Goal_Stable}" IsChecked="{Binding IsGoalStable, Mode=TwoWay}" />
+            <RadioButton Style="{StaticResource Segment}" GroupName="ovgoal" Content="{l:T Goal_Latency}" IsChecked="{Binding IsGoalLatency, Mode=TwoWay}" />
+        </WrapPanel>
+        <TextBlock Style="{StaticResource MutedText}" Margin="0,0,0,12" Text="{Binding BusyText}"
+                   Visibility="{Binding IsBusy, Converter={StaticResource BoolVis}}" />
+
+        <!-- ===================== with a session ===================== -->
+        <StackPanel Visibility="{Binding HasSession, Converter={StaticResource BoolVis}}">
+            <!-- Four KPIs, no cards: separated by hairlines -->
+            <Grid Margin="0,4,0,18">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <StackPanel c:Motion.RevealIndex="0">
+                    <StackPanel Orientation="Horizontal">
+                        <c:CountUpText Style="{StaticResource KpiValue}" Value="{Binding AvgFps}" Decimals="0" />
+                        <TextBlock Style="{StaticResource KpiUnit}" Text="FPS" />
+                    </StackPanel>
+                    <TextBlock Style="{StaticResource KpiLabel}" Text="{l:T Kpi_AvgLabel}" />
+                    <TextBlock Style="{StaticResource KpiSub}" Text="{Binding AvgFpsSub}" />
+                </StackPanel>
+                <Border Grid.Column="1" Style="{StaticResource KpiCell}" c:Motion.RevealIndex="1">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <c:CountUpText Style="{StaticResource KpiValue}" Value="{Binding P99Ms}" Decimals="2" />
+                            <TextBlock Style="{StaticResource KpiUnit}" Text="{l:T Unit_Ms}" />
+                        </StackPanel>
+                        <TextBlock Style="{StaticResource KpiLabel}" Text="{l:T Kpi_P99Label}" />
+                        <TextBlock Style="{StaticResource KpiSub}" Text="{Binding P99Sub}" />
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="2" Style="{StaticResource KpiCell}" c:Motion.RevealIndex="2">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <c:CountUpText Style="{StaticResource KpiValue}" Value="{Binding OneLowFps}" Decimals="0" />
+                            <TextBlock Style="{StaticResource KpiUnit}" Text="FPS" />
+                        </StackPanel>
+                        <TextBlock Style="{StaticResource KpiLabel}" Text="{l:T Kpi_LowLabel}" />
+                        <TextBlock Style="{StaticResource KpiSub}" Text="{Binding OneLowSub}" />
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="3" Style="{StaticResource KpiCell}" c:Motion.RevealIndex="3">
+                    <StackPanel>
+                        <c:CountUpText Style="{StaticResource KpiValue}" Value="{Binding SpikeCount}" Decimals="0" />
+                        <TextBlock Style="{StaticResource KpiLabel}" Text="{l:T Kpi_SpikesLabel}" />
+                        <TextBlock Style="{StaticResource KpiSub}" Text="{Binding SpikesSub}" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- The hero: every frame of the session, spikes with what coincided with them -->
+            <Border Style="{StaticResource Panel}" Padding="20,16,20,12" c:Motion.RevealIndex="2">
+                <StackPanel>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource H2}" Text="{l:T Overview_ChartTitle}" />
+                            <TextBlock Style="{StaticResource MutedText}" FontSize="12" Text="{l:T Overview_ChartSub}" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top">
+                            <Rectangle Width="14" Height="2" Fill="{StaticResource Accent}" VerticalAlignment="Center" Margin="0,0,6,0" />
+                            <TextBlock Text="{l:T Legend_Frame}" Foreground="{StaticResource Text2}" FontSize="12" Margin="0,0,14,0" />
+                            <Line X1="0" X2="14" Stroke="White" StrokeThickness="1.5" StrokeDashArray="2 2" VerticalAlignment="Center" Margin="0,0,6,0" />
+                            <TextBlock Text="P99" Foreground="{StaticResource Text2}" FontSize="12" Margin="0,0,14,0" />
+                            <Rectangle Width="8" Height="8" Stroke="{StaticResource Danger}" StrokeThickness="1.5" VerticalAlignment="Center" Margin="0,0,6,0">
+                                <Rectangle.RenderTransform><RotateTransform Angle="45" CenterX="4" CenterY="4" /></Rectangle.RenderTransform>
+                            </Rectangle>
+                            <TextBlock Text="{l:T Legend_Spike}" Foreground="{StaticResource Text2}" FontSize="12" Margin="0,0,14,0" />
+                            <Rectangle Width="3" Height="12" Fill="{StaticResource Warn}" VerticalAlignment="Center" Margin="0,0,6,0" />
+                            <TextBlock Text="{l:T Legend_Marker}" Foreground="{StaticResource Text2}" FontSize="12" />
+                        </StackPanel>
+                    </Grid>
+                    <c:FrameTimeChart Height="230" Margin="-6,10,0,6" Frames="{Binding LatestFrames}" Insights="{Binding LatestInsights}"
+                                      BudgetMs="{Binding BudgetMs}" SessionId="{Binding LatestId}" />
+                    <ItemsControl ItemsSource="{Binding CauseChips}">
+                        <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border x:Name="Chip" Style="{StaticResource CauseChip}">
+                                    <TextBlock x:Name="ChipText" Text="{Binding Text}" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource Text2}" />
+                                </Border>
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding IsTop}" Value="True">
+                                        <Setter TargetName="Chip" Property="Background" Value="{StaticResource DangerSoft}" />
+                                        <Setter TargetName="Chip" Property="BorderBrush" Value="#55F87171" />
+                                        <Setter TargetName="ChipText" Property="Foreground" Value="{StaticResource Danger}" />
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <TextBlock Style="{StaticResource MutedText}" FontSize="12" Text="{Binding MarkersLine}" />
+                    <TextBlock Style="{StaticResource MutedText}" FontSize="12" Text="{Binding SensorNote}" Margin="0,2,0,0" />
+                </StackPanel>
+            </Border>
+
+            <Grid Margin="0,16,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="5*" />
+                    <ColumnDefinition Width="16" />
+                    <ColumnDefinition Width="4*" />
+                    <ColumnDefinition Width="16" />
+                    <ColumnDefinition Width="4*" />
+                </Grid.ColumnDefinitions>
+                <!-- Bottleneck and latency -->
+                <Border Style="{StaticResource Panel}" c:Motion.RevealIndex="3">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource H2}" Text="{l:T Overview_BottleneckTitle}" />
+                        <TextBlock Style="{StaticResource Body}" Text="{Binding BottleneckText}" Margin="0,10,0,8" />
+                        <Grid Height="10" Margin="0,0,0,4" Visibility="{Binding HasBottleneck, Converter={StaticResource BoolVis}}">
+                            <Border Background="{StaticResource MutedGrey}" CornerRadius="5" Opacity="0.35" />
+                            <ProgressBar Height="10" Minimum="0" Maximum="1" Value="{Binding GpuBoundShare, Mode=OneWay}" Foreground="{StaticResource Accent}" Background="Transparent" />
+                        </Grid>
+                        <Grid Margin="0,0,0,12" Visibility="{Binding HasBottleneck, Converter={StaticResource BoolVis}}">
+                            <TextBlock Text="GPU" Foreground="{StaticResource Accent}" FontSize="12" FontWeight="SemiBold" />
+                            <TextBlock Text="CPU" Foreground="{StaticResource MutedGrey}" FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Right" />
+                        </Grid>
+                        <TextBlock Style="{StaticResource Body}" Text="{Binding LatencyText}" />
+                    </StackPanel>
+                </Border>
+                <!-- What was found -->
+                <Border Grid.Column="2" Style="{StaticResource Panel}" c:Motion.RevealIndex="4">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource H2}" Text="{l:T Overview_FoundTitle}" />
+                        <Grid Margin="0,12,0,14">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource Metric}" Foreground="{StaticResource Accent}" Text="{Binding AutoCount}" />
+                                <TextBlock Style="{StaticResource MutedText}" FontSize="12" Text="{l:T Kind_Auto}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Style="{StaticResource Metric}" Text="{Binding UserCount}" />
+                                <TextBlock Style="{StaticResource MutedText}" FontSize="12" Text="{l:T Kind_User}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Style="{StaticResource Metric}" Text="{Binding DiagCount}" />
+                                <TextBlock Style="{StaticResource MutedText}" FontSize="12" Text="{l:T Kind_Diag}" />
+                            </StackPanel>
+                        </Grid>
+                        <Button Style="{StaticResource PrimaryButton}" HorizontalAlignment="Stretch" Margin="0" Command="{Binding ViewPlanCommand}" Content="{l:T Overview_ViewPlan}" />
+                    </StackPanel>
+                </Border>
+                <!-- System state -->
+                <Border Grid.Column="4" Style="{StaticResource Panel}" c:Motion.RevealIndex="5">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource H2}" Text="{l:T Overview_SystemState}" Margin="0,0,0,10" />
+                        <ItemsControl ItemsSource="{Binding Status}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,0,0,8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="16" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Ellipse Width="6" Height="6" VerticalAlignment="Top" Margin="0,7,0,0" Fill="{Binding Ok, Converter={StaticResource StatusBrush}}" />
+                                        <TextBlock Grid.Column="1" Style="{StaticResource Body}" FontSize="13" Text="{Binding Text}" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <Button Style="{StaticResource LinkButton}" HorizontalAlignment="Left" Command="{Binding HardwareCommand}" Content="{l:T Overview_SeeHardware}" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </StackPanel>
+
+        <!-- ===================== first run: no session yet ===================== -->
+        <Grid Visibility="{Binding NoSession, Converter={StaticResource BoolVis}}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="3*" />
                 <ColumnDefinition Width="16" />
                 <ColumnDefinition Width="2*" />
             </Grid.ColumnDefinitions>
-
-            <!-- Primary action card -->
-            <Border Style="{StaticResource Card}" Padding="26">
+            <Border Style="{StaticResource Panel}" Padding="24" c:Motion.RevealIndex="0">
                 <StackPanel>
-                    <TextBlock Style="{StaticResource Eyebrow}" Text="{l:T Overview_GameLabel}" />
-                    <WrapPanel Margin="0,0,0,10">
-                        <RadioButton Style="{StaticResource Segment}" GroupName="ovgame" Content="Counter-Strike 2" IsChecked="{Binding IsCs2, Mode=TwoWay}" />
-                        <RadioButton Style="{StaticResource Segment}" GroupName="ovgame" Content="VALORANT" IsChecked="{Binding IsValorant, Mode=TwoWay}" />
-                    </WrapPanel>
-                    <TextBlock Style="{StaticResource Eyebrow}" Text="{l:T Overview_GoalLabel}" />
-                    <WrapPanel Margin="0,0,0,18">
-                        <RadioButton Style="{StaticResource Segment}" GroupName="ovgoal" Content="{l:T Goal_Stable}" IsChecked="{Binding IsGoalStable, Mode=TwoWay}" />
-                        <RadioButton Style="{StaticResource Segment}" GroupName="ovgoal" Content="{l:T Goal_Latency}" IsChecked="{Binding IsGoalLatency, Mode=TwoWay}" />
-                    </WrapPanel>
+                    <TextBlock Style="{StaticResource H2}" Text="{Binding Headline}" />
+                    <TextBlock Style="{StaticResource Body}" Text="{l:T Overview_Sub}" Margin="0,8,0,16" />
                     <TextBlock Style="{StaticResource Body}" Text="{Binding GameLine}" />
                     <TextBlock Style="{StaticResource Body}" Text="{Binding GoalLine}" />
-                    <TextBlock Style="{StaticResource Body}" Text="{Binding LastTestLine}" Margin="0,0,0,22" />
+                    <TextBlock Style="{StaticResource Body}" Text="{Binding LastTestLine}" Margin="0,0,0,18" />
                     <StackPanel Orientation="Horizontal">
-                        <Button Style="{StaticResource PrimaryButton}" Command="{Binding CheckCommand}" Content="{l:T Overview_Check}" Padding="22,12" FontSize="15" />
+                        <Button Style="{StaticResource PrimaryButton}" Command="{Binding CheckCommand}" Content="{l:T Overview_Check}" />
                         <Button Command="{Binding MeasureCommand}" Content="{l:T Overview_Measure}" />
                     </StackPanel>
-                    <TextBlock Style="{StaticResource MutedText}" Margin="0,14,0,0" Text="{Binding BusyText}"
-                               Visibility="{Binding IsBusy, Converter={StaticResource BoolVis}}" />
                     <TextBlock Style="{StaticResource MutedText}" Margin="0,14,0,0" Text="{l:T Overview_CheckNote}" />
+                    <TextBlock Style="{StaticResource MutedText}" Margin="0,10,0,0" Text="{l:T Overview_How}" />
                 </StackPanel>
             </Border>
-
-            <!-- System status -->
-            <Border Grid.Column="2" Style="{StaticResource Card}">
+            <Border Grid.Column="2" Style="{StaticResource Panel}" c:Motion.RevealIndex="1">
                 <StackPanel>
-                    <TextBlock Style="{StaticResource Eyebrow}" Text="{l:T Overview_SystemState}" />
+                    <TextBlock Style="{StaticResource H2}" Text="{l:T Overview_SystemState}" Margin="0,0,0,10" />
                     <ItemsControl ItemsSource="{Binding Status}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Grid Margin="0,0,0,10">
+                                <Grid Margin="0,0,0,8">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="18" />
+                                        <ColumnDefinition Width="16" />
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
-                                    <Ellipse Width="8" Height="8" VerticalAlignment="Top" Margin="0,7,0,0"
-                                             Fill="{Binding Ok, Converter={StaticResource StatusBrush}}" />
-                                    <TextBlock Grid.Column="1" Style="{StaticResource Body}" Text="{Binding Text}" />
+                                    <Ellipse Width="6" Height="6" VerticalAlignment="Top" Margin="0,7,0,0" Fill="{Binding Ok, Converter={StaticResource StatusBrush}}" />
+                                    <TextBlock Grid.Column="1" Style="{StaticResource Body}" FontSize="13" Text="{Binding Text}" />
                                 </Grid>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
@@ -63,38 +262,5 @@
                 </StackPanel>
             </Border>
         </Grid>
-
-        <!-- Result summary -->
-        <Border Style="{StaticResource Card}" Visibility="{Binding HasSnapshot, Converter={StaticResource BoolVis}}">
-            <StackPanel>
-                <TextBlock Style="{StaticResource Eyebrow}" Text="{l:T Overview_Result}" />
-                <UniformGrid Columns="3" Margin="0,4,0,18">
-                    <StackPanel Margin="0,0,16,0">
-                        <TextBlock Style="{StaticResource Metric}" Foreground="{StaticResource Accent}" Text="{Binding AutoCount}" />
-                        <TextBlock Style="{StaticResource MutedText}" Text="{l:T Kind_Auto}" />
-                    </StackPanel>
-                    <StackPanel Margin="0,0,16,0">
-                        <TextBlock Style="{StaticResource Metric}" Text="{Binding UserCount}" />
-                        <TextBlock Style="{StaticResource MutedText}" Text="{l:T Kind_User}" />
-                    </StackPanel>
-                    <StackPanel>
-                        <TextBlock Style="{StaticResource Metric}" Text="{Binding DiagCount}" />
-                        <TextBlock Style="{StaticResource MutedText}" Text="{l:T Kind_Diag}" />
-                    </StackPanel>
-                </UniformGrid>
-                <StackPanel Orientation="Horizontal">
-                    <Button Style="{StaticResource PrimaryButton}" Command="{Binding ViewPlanCommand}" Content="{l:T Overview_ViewPlan}" />
-                    <Button Command="{Binding MeasureCommand}" Content="{l:T Overview_MeasureGame}" />
-                </StackPanel>
-            </StackPanel>
-        </Border>
-
-        <!-- How it works -->
-        <Border Style="{StaticResource Card}">
-            <StackPanel>
-                <TextBlock Style="{StaticResource Eyebrow}" Text="{l:T Overview_HowTitle}" />
-                <TextBlock Style="{StaticResource Body}" Text="{l:T Overview_How}" />
-            </StackPanel>
-        </Border>
     </StackPanel>
 </UserControl>

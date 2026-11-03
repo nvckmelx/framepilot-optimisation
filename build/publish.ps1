@@ -35,6 +35,7 @@ if ($PresentMon) {
     New-Item -ItemType Directory -Force $tools | Out-Null
     Copy-Item $PresentMon (Join-Path $tools "PresentMon.exe") -Force
     Copy-Item $PresentMonLicense (Join-Path $tools "PresentMon-LICENSE.txt") -Force
+    if ((Split-Path $PresentMon -Leaf) -match 'PresentMon-([\d\.]+)') { Set-Content -NoNewline (Join-Path $tools "PresentMon-VERSION.txt") $Matches[1] }
 }
 
 Write-Host "Published to $out"

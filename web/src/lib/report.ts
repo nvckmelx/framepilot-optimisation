@@ -57,6 +57,19 @@ export interface TestConditions {
   scenarioNote: string | null;
 }
 
+/* TuneFPS 1.1: what each spike coincided with (system sensors during the recording). Optional: absent in 1.0 reports. */
+export type SpikeCause = "VramFull" | "Paging" | "CpuThrottle" | "GpuLimit" | "BackgroundProcess" | "CpuSideFrame" | "GpuSideFrame" | "NoMatch";
+export interface SpikeAttribution { timeMs: number; frameTimeMs: number; cause: SpikeCause; value?: number | null; reference?: number | null; processName?: string | null }
+export interface LagMarker { timeMs: number; nearestSpikeTimeMs?: number | null }
+export interface SessionInsights {
+  spikes: SpikeAttribution[];
+  markers: LagMarker[];
+  bottleneck: { gpuBoundShare: Measured<number>; medianCpuBusyMs: Measured<number>; medianGpuBusyMs: Measured<number> };
+  latency: { pcLatencyMs: Measured<number>; clickToPhotonMs: Measured<number>; displayLatencyMs: Measured<number> };
+  unavailableSensors: string[];
+  sensorTimingApproximate: boolean;
+}
+
 export interface SessionRecord {
   id: string;
   game: GameId;
@@ -69,6 +82,7 @@ export interface SessionRecord {
   stats: FrameStats;
   isDemo: boolean;
   warnings: string[];
+  insights?: SessionInsights | null;
 }
 
 export interface Evidence {

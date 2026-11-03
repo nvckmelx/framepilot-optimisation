@@ -156,11 +156,51 @@ function FrameTimeChart({ report }: { report: DiagnosticReport }) {
           {ticks.map((s) => (
             <text key={s} x={L + (s / seconds) * (W - L - R)} y={H - 7} textAnchor="middle" fontSize="10" fill="#A3B3C6" fontFamily={MONO}>{s}s</text>
           ))}
+          {/* TuneFPS 1.1: spikes with an attributed cause are diamonds (brand rule: a shape and text, never colour alone) */}
+          {(session?.insights?.spikes ?? []).map((s, k) => {
+            const x = X(Math.min(n - 1, (s.timeMs / Math.max(1, fs.durationMs)) * (n - 1)));
+            const y = Y(s.frameTimeMs);
+            return <rect key={k} x={x - 4.5} y={y - 4.5} width="9" height="9" transform={`rotate(45 ${x} ${y})`} fill="#111214" stroke={FLARE} strokeWidth="2"
+              style={{ opacity: g > 0.7 ? 1 : 0, transition: "opacity .3s" }} />;
+          })}
           {hover !== null && <line x1={X(hover)} x2={X(hover)} y1={T} y2={base} stroke={PAPER} strokeOpacity=".7" strokeWidth="1.2" />}
           <rect x={L} y={0} width={Math.max(0, W - L - R)} height={H} fill="transparent"
             onPointerMove={onMove} onPointerLeave={() => { setHover(null); setTip(null); }} />
         </svg>
       )}
+    </div>
+  );
+}
+
+/* ---------------- spike causes (TuneFPS 1.1) ---------------- */
+function SpikeCauses({ session }: { session?: SessionRecord }) {
+  const { t, lang } = useLang();
+  const i = session?.insights;
+  if (!i) return null;
+  const groups = new Map<string, number>();
+  i.spikes.forEach((s) => groups.set(s.cause, (groups.get(s.cause) ?? 0) + 1));
+  const sorted = [...groups.entries()].sort((a, b) => b[1] - a[1]);
+  const share = i.bottleneck.gpuBoundShare;
+  const gpu = share.isAvailable && share.value != null ? Math.round(share.value * 100) : null;
+  const pc = i.latency.pcLatencyMs, disp = i.latency.displayLatencyMs;
+  const f = (s: string, v: string | number) => s.replace("{0}", String(v));
+  return (
+    <div className="mt-1">
+      <div className="text-[12.5px] font-semibold text-fg/80">{t.causes_title}</div>
+      <div className="mt-2 flex flex-wrap gap-2">
+        {sorted.map(([cause, count], k) => (
+          <span key={cause} className={cn("rounded-[6px] border px-2 py-0.5 text-[12px] font-semibold",
+            k === 0 && cause !== "NoMatch" ? "border-alert/40 bg-alert/10 text-alert" : "border-line bg-raised text-fg2")}>
+            {t.cause[cause] ?? cause} · {count}
+          </span>
+        ))}
+      </div>
+      <div className="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-[12px] text-muted">
+        {gpu != null && <span>{f(gpu >= 50 ? t.bottleneck_gpu : t.bottleneck_cpu, gpu >= 50 ? gpu : 100 - gpu)}</span>}
+        {pc.isAvailable && pc.value != null ? <span>{f(t.latency_pc, fmt(pc.value, 1, lang))}</span>
+          : disp.isAvailable && disp.value != null ? <span>{f(t.latency_display, fmt(disp.value, 1, lang))}</span> : null}
+        {i.markers.length > 0 && <span>{f(t.markers_n, i.markers.length)}</span>}
+      </div>
     </div>
   );
 }
@@ -511,6 +551,7 @@ export function PerformanceBento({ report, className }: PerformanceBentoProps) {
             </div>
           )}
           <FrameTimeChart report={report} />
+          <SpikeCauses session={latest} />
         </Tile>
 
         <VerdictTile report={report} />

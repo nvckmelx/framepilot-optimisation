@@ -97,14 +97,20 @@ public static class ReportBuilder
         "Frame time is not input lag. Full click-to-photon latency requires dedicated hardware measurement and is not reported.",
         "Static PC inventory is not the same as analysing game behaviour; game sessions are required for performance conclusions.",
         "Matches with different players, maps and situations are not a laboratory A/B test.",
-        "Values marked unavailable were not obtained; FramePilot never substitutes estimates for them."
+        "Values marked unavailable were not obtained; TuneFPS never substitutes estimates for them."
     };
 
     public static DiagnosticReport Build(string appVersion, string language, SystemSnapshot? snapshot, IReadOnlyList<SessionRecord> sessions,
         IReadOnlyList<Recommendation> recommendations, ComparisonResult? comparison, IReadOnlyList<ChangeRecord> changes,
-        SessionRecord? latestSession = null, IReadOnlyList<FrameSample>? latestFrames = null)
+        SessionRecord? latestSession = null, IReadOnlyList<FrameSample>? latestFrames = null, bool includeProcessNames = false)
     {
         var demo = (snapshot?.IsDemo ?? false) || sessions.Any(s => s.IsDemo);
+        // Names of the user's other programs stay on the PC unless the user explicitly includes them.
+        if (!includeProcessNames)
+            sessions = sessions.Select(s => s.Insights is null ? s : s with
+            {
+                Insights = s.Insights with { Spikes = s.Insights.Spikes.Select(x => x with { ProcessName = null }).ToList() }
+            }).ToList();
         return new DiagnosticReport(DiagnosticReport.CurrentSchema, DateTimeOffset.Now, appVersion, demo, language, snapshot, sessions,
             recommendations, comparison,
             changes.Select(c => new ChangeSummary(c.Id, c.BatchId, c.ActionId, c.ActionVersion, c.TargetDescription,
@@ -129,10 +135,10 @@ public static class ReportBuilder
         sb.Append($$"""
             <!doctype html><html lang="{{(ru ? "ru" : "en")}}"><head><meta charset="utf-8">
             <meta name="viewport" content="width=device-width,initial-scale=1">
-            <title>FramePilot — {{T("Диагностический отчёт", "Diagnostic report")}}</title>
+            <title>TuneFPS — {{T("Диагностический отчёт", "Diagnostic report")}}</title>
             <style>
-            :root{--bg:#101412;--panel:#1B211D;--line:#39413B;--text:#F4F6EF;--muted:#AEB8AE;--accent:#CBFF4D;--warn:#ffb547;--bad:#ff6b5e}
-            *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 Arial,Helvetica,sans-serif}
+            :root{--bg:#1A1C20;--panel:#111214;--line:#2C3038;--text:#FFFFFF;--muted:#9BA3AE;--accent:#4C9DFF;--warn:#F59E0B;--bad:#F87171}
+            *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 Inter,'Segoe UI',sans-serif}
             main{max-width:1040px;margin:0 auto;padding:32px 20px 64px}h1{font-size:28px;margin:0 0 4px}h2{font-size:18px;margin:36px 0 12px;color:var(--accent);letter-spacing:.04em;text-transform:uppercase}
             .muted{color:var(--muted)}.na{color:var(--muted);border-bottom:1px dotted var(--muted);cursor:help}
             .demo{background:var(--accent);color:#101412;font-weight:700;padding:10px 14px;border-radius:4px;margin:16px 0}
@@ -143,7 +149,7 @@ public static class ReportBuilder
             .tag.auto{border-color:var(--accent);color:var(--accent)}svg{width:100%;height:220px;background:var(--panel);border:1px solid var(--line);border-radius:10px}
             code{color:var(--accent)}
             </style></head><body><main>
-            <h1>FRAMEPILOT</h1><div class="muted">{{T("Диагностический отчёт", "Diagnostic report")}} · {{E(r.GeneratedAt.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture))}} · v{{E(r.AppVersion)}}</div>
+            <h1>TuneFPS</h1><div class="muted">{{T("Диагностический отчёт", "Diagnostic report")}} · {{E(r.GeneratedAt.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture))}} · v{{E(r.AppVersion)}}</div>
             """);
         if (r.IsDemo)
             sb.Append($"<div class=demo>{T("ДЕМО-ДАННЫЕ: этот отчёт содержит демонстрационные значения, а не измерения вашего ПК.", "DEMO DATA: this report contains demonstration values, not measurements of your PC.")}</div>");
