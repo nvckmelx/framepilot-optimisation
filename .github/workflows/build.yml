@@ -48,6 +48,18 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           # The 1.0.x download link (and the website before 1.1) points to the old file name: publish both.
           Copy-Item artifacts/TuneFPS-Setup-x64.exe artifacts/FramePilot-Setup-x64.exe
+      - name: UI smoke test (design preview, every section rendered to PNG)
+        shell: pwsh
+        run: |
+          $shots = Join-Path $PWD "artifacts\screens"
+          $p = Start-Process artifacts/FramePilot/FramePilot.exe -ArgumentList "--design-preview","--lang","ru","--screenshots","`"$shots`"" -PassThru
+          if (-not $p.WaitForExit(180000)) { $p.Kill(); throw "UI tour timed out" }
+          $log = Join-Path $env:LOCALAPPDATA "FramePilot\design-preview\logs"
+          if (Test-Path $log) { Get-ChildItem $log -File | ForEach-Object { Write-Host "== $($_.Name)"; Get-Content $_.FullName } }
+          if ($p.ExitCode -ne 0) { throw "UI tour failed with exit code $($p.ExitCode)" }
+          $n = @(Get-ChildItem $shots -Filter *.png).Count
+          if ($n -lt 6) { throw "Expected 6 screenshots, got $n" }
+          if ((Test-Path $log) -and (Select-String -Path (Join-Path $log "*") -Pattern "Exception" -Quiet)) { throw "Exceptions in the app log" }
       - uses: actions/upload-artifact@v4
         with:
           name: TuneFPS
@@ -71,3 +83,17 @@ jobs:
             artifacts/FramePilot-Setup-x64.exe
           body_path: docs/releases/${{ inputs.release_tag || github.ref_name }}.md
           generate_release_notes: true
+      - name: Publish UI screenshots to the ci-screenshots branch
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $repo = Join-Path $env:RUNNER_TEMP "shots-repo"
+          git init -q $repo
+          Copy-Item artifacts/screens/*.png $repo
+          Set-Location $repo
+          git config user.name "ci"; git config user.email "ci@users.noreply.github.com"
+          git add *.png
+          git commit -q -m "UI screenshots for $env:GITHUB_SHA"
+          git push -q -f "https://x-access-token:$env:GH_TOKEN@github.com/$env:GITHUB_REPOSITORY.git" HEAD:ci-screenshots

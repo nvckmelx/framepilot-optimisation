@@ -47,6 +47,9 @@ public partial class App : Application
 
         ErrorReporter.LogDirectory = services.LogsDirectory;
         ErrorReporter.Log("start", $"TuneFPS {services.AppVersion} started{(designPreview ? " (design preview)" : "")}");
+        var langIndex = Array.FindIndex(e.Args, a => a.Equals("--lang", StringComparison.OrdinalIgnoreCase));
+        if (langIndex >= 0 && langIndex + 1 < e.Args.Length && e.Args[langIndex + 1] is "ru" or "en")
+            services.Settings.Language = e.Args[langIndex + 1];
         Loc.Instance.Language = services.Settings.Language;
 
         // Reconcile journal entries left in intermediate states by a crash, power loss or reboot (read-only check).
@@ -66,6 +69,11 @@ public partial class App : Application
         MainWindow = window;
         vm.Initialize();
         window.Show();
+
+        // CI/QA only: "--design-preview --screenshots <dir>" renders every section to PNG and exits (no capture, no changes).
+        var shotIndex = Array.FindIndex(e.Args, a => a.Equals("--screenshots", StringComparison.OrdinalIgnoreCase));
+        if (designPreview && shotIndex >= 0 && shotIndex + 1 < e.Args.Length)
+            _ = ScreenshotTour.RunAsync(window, vm, e.Args[shotIndex + 1]);
     }
 
     /// <summary>
@@ -96,6 +104,54 @@ public partial class App : Application
     {
         ErrorReporter.Report(e.Exception);
         e.Handled = true;
+    }
+}
+
+/// <summary>Renders each section of the design preview to PNG (used by CI as a UI smoke test), then exits.</summary>
+internal static class ScreenshotTour
+{
+    public static async Task RunAsync(Window window, MainViewModel vm, string directory)
+    {
+        var code = 0;
+        try
+        {
+            System.IO.Directory.CreateDirectory(directory);
+            window.Width = 1320;
+            window.Height = 860;
+            await Task.Delay(2500);
+            var i = 0;
+            foreach (var item in vm.Nav)
+            {
+                vm.Navigate(item.Page);
+                await Task.Delay(2600); // let the intro motion finish
+                Save(window, System.IO.Path.Combine(directory, $"{++i:00}-{item.Key.Replace("Nav_", "").ToLowerInvariant()}.png"));
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorReporter.Log("screenshots", ex.ToString());
+            code = 3;
+        }
+        Current.Shutdown(code);
+    }
+
+    private static void Save(Window window, string path)
+    {
+        if (window.Content is not FrameworkElement root) return;
+        root.UpdateLayout();
+        var dpi = VisualTreeHelper.GetDpi(window);
+        var w = Math.Max(1, (int)Math.Ceiling(root.ActualWidth * dpi.DpiScaleX));
+        var h = Math.Max(1, (int)Math.Ceiling(root.ActualHeight * dpi.DpiScaleY));
+        var rtb = new System.Windows.Media.Imaging.RenderTargetBitmap(w, h, 96 * dpi.DpiScaleX, 96 * dpi.DpiScaleY, PixelFormats.Pbgra32);
+        var bg = new DrawingVisual();
+        using (var dc = bg.RenderOpen())
+            dc.DrawRectangle((Brush)window.Background, null, new Rect(0, 0, root.ActualWidth, root.ActualHeight));
+        rtb.Render(bg);
+        rtb.Render(root);
+        var enc = new System.Windows.Media.Imaging.PngBitmapEncoder();
+        enc.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(rtb));
+        using var f = System.IO.File.Create(path);
+        enc.Save(f);
     }
 }
 
