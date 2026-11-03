@@ -20,6 +20,7 @@ public sealed class Loc : INotifyPropertyChanged
         set
         {
             var v = value == "en" ? "en" : "ru";
+            ApplyCulture(v);
             if (v == _language) return;
             _language = v;
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(Binding.IndexerName));
@@ -29,6 +30,20 @@ public sealed class Loc : INotifyPropertyChanged
     }
 
     public bool IsRussian => _language == "ru";
+
+    /// <summary>
+    /// Dates and decimals follow the interface language (Russian UI → "3 ноября", "5,24"). An English UI keeps the
+    /// system's own English culture (en-GB, en-US …) and falls back to en-US on non-English systems.
+    /// </summary>
+    private static void ApplyCulture(string lang)
+    {
+        var system = System.Globalization.CultureInfo.InstalledUICulture;
+        var culture = lang == "ru"
+            ? System.Globalization.CultureInfo.GetCultureInfo("ru-RU")
+            : system.TwoLetterISOLanguageName == "en" ? system : System.Globalization.CultureInfo.GetCultureInfo("en-US");
+        System.Globalization.CultureInfo.CurrentCulture = culture;
+        System.Globalization.CultureInfo.DefaultThreadCurrentCulture = culture;
+    }
 
     public string this[string key] => Strings.Get(_language, key);
 

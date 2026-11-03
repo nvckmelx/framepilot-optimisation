@@ -40,7 +40,14 @@ public static class PresentMonLocator
 
     public static string? Version(string exePath)
     {
-        try { return FileVersionInfo.GetVersionInfo(exePath).ProductVersion; }
+        try
+        {
+            var v = FileVersionInfo.GetVersionInfo(exePath).ProductVersion;
+            if (!string.IsNullOrWhiteSpace(v)) return v;
+            // PresentMon 2.x console builds carry no version resource; the installer writes it next to the exe.
+            var marker = Path.Combine(Path.GetDirectoryName(exePath) ?? "", "PresentMon-VERSION.txt");
+            return File.Exists(marker) ? File.ReadAllText(marker).Trim() : null;
+        }
         catch { return null; }
     }
 }
