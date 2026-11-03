@@ -38,6 +38,9 @@ public sealed class SensorSampler : IAsyncDisposable
         _vramBudget = vramBudgetBytes;
     }
 
+    /// <summary>The most recent reading, for the live view while recording.</summary>
+    public SensorSample? Latest { get { lock (_samples) return _samples.Count == 0 ? null : _samples[^1].Values; } }
+
     /// <summary>Why some sensors were not available on this PC (empty when everything worked).</summary>
     public IReadOnlyList<string> Notes => _notes;
 

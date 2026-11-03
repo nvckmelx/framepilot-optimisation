@@ -103,6 +103,26 @@
                 <ProgressBar Margin="0,16,0,6" Value="{Binding CaptureProgress, Mode=OneWay}" Maximum="100"
                              Visibility="{Binding Capturing, Converter={StaticResource BoolVis}}" />
                 <TextBlock Style="{StaticResource MutedText}" Text="{Binding CaptureStatus}" Margin="0,6,0,0" />
+                <!-- Live sensors while recording (read-only); Ctrl+Shift+F9 sets a lag marker -->
+                <Border Background="{StaticResource Surface2}" CornerRadius="8" Padding="14,10" Margin="0,12,0,0"
+                        Visibility="{Binding Capturing, Converter={StaticResource BoolVis}}">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                            <Ellipse Width="8" Height="8" Fill="{StaticResource Danger}" Margin="0,0,8,0" VerticalAlignment="Center" />
+                            <TextBlock Text="{l:T Live_Title}" FontWeight="SemiBold" />
+                        </StackPanel>
+                        <ItemsControl ItemsSource="{Binding LiveLines}">
+                            <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="2" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}" Foreground="{StaticResource Text2}" FontSize="13" Margin="0,2,16,2"
+                                               Typography.NumeralAlignment="Tabular" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <TextBlock Style="{StaticResource MutedText}" FontSize="12" Text="{l:T Live_Hint}" Margin="0,6,0,0" />
+                    </StackPanel>
+                </Border>
             </StackPanel>
         </Border>
 
@@ -182,7 +202,7 @@
                                Visibility="{Binding HasSelection, Converter={StaticResource InvBoolVis}}" />
                     <StackPanel Visibility="{Binding HasSelection, Converter={StaticResource BoolVis}}">
                         <TextBlock Style="{StaticResource Eyebrow}" Text="{l:T Sessions_ChartTitle}" />
-                        <c:FrameTimeChart Frames="{Binding Frames}" Height="240" Margin="0,0,0,16" />
+                        <c:FrameTimeChart Frames="{Binding Frames}" Insights="{Binding SelectedInsights}" SessionId="{Binding SelectedId}" Height="240" Margin="0,0,0,16" />
                         <ItemsControl ItemsSource="{Binding Metrics}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>

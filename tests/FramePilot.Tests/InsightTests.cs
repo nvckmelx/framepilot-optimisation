@@ -245,3 +245,33 @@ public class PresentMon2ColumnTests
         Assert.Equal(s.Stats.SpikeCount, back.Stats.SpikeCount);
     }
 }
+
+public class AutoCaptureWatcherTests
+{
+    [Fact]
+    public void FiresOncePerLaunch_AfterDelay()
+    {
+        int? pid = 100;
+        var w = new FramePilot.GameAdapters.AutoCaptureWatcher(g => g == GameId.Cs2 ? pid : null);
+        var t0 = DateTimeOffset.Parse("2026-11-04T10:00:00Z");
+        var delay = TimeSpan.FromSeconds(120);
+        Assert.Null(w.Poll(t0, delay, enabled: true, busy: false));
+        Assert.Null(w.Poll(t0.AddSeconds(119), delay, true, false));
+        Assert.Equal(GameId.Cs2, w.Poll(t0.AddSeconds(121), delay, true, false));
+        Assert.Null(w.Poll(t0.AddSeconds(500), delay, true, false));          // same launch: never again
+        pid = 200;                                                          // the game was restarted
+        Assert.Null(w.Poll(t0.AddSeconds(501), delay, true, false));
+        Assert.Equal(GameId.Cs2, w.Poll(t0.AddSeconds(622), delay, true, false));
+    }
+
+    [Fact]
+    public void Disabled_OrBusy_DoesNotFire_ButKeepsTheLaunchTime()
+    {
+        var w = new FramePilot.GameAdapters.AutoCaptureWatcher(g => g == GameId.Valorant ? 7 : null);
+        var t0 = DateTimeOffset.Parse("2026-11-04T10:00:00Z");
+        var delay = TimeSpan.FromSeconds(60);
+        Assert.Null(w.Poll(t0, delay, enabled: false, busy: false));
+        Assert.Null(w.Poll(t0.AddSeconds(90), delay, enabled: true, busy: true));
+        Assert.Equal(GameId.Valorant, w.Poll(t0.AddSeconds(95), delay, enabled: true, busy: false));
+    }
+}

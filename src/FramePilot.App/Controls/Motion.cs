@@ -77,7 +77,7 @@ public sealed class CountUpText : TextBlock
     public double Value { get => (double)GetValue(ValueProperty); set => SetValue(ValueProperty, value); }
     public int Decimals { get => (int)GetValue(DecimalsProperty); set => SetValue(DecimalsProperty, value); }
 
-    public CountUpText() => Typography.SetNumeralAlignment(this, FontNumeralAlignment.Tabular);
+    public CountUpText() => System.Windows.Documents.Typography.SetNumeralAlignment(this, FontNumeralAlignment.Tabular);
 
     private static void OnValueChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {

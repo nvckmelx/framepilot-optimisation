@@ -35,13 +35,37 @@ public sealed class CaptureService
 
     public int MarkerCount { get { lock (_markers) return _markers.Count; } }
 
+    private SensorSampler? _sampler;
+
+    /// <summary>Latest live sensor reading while a capture runs (null otherwise).</summary>
+    public SensorSample? LiveSensors => _sampler?.Latest;
+
+    /// <summary>
+    /// ETW tracing without a UAC prompt needs membership in "Performance Log Users" (S-1-5-32-559) or an elevated token.
+    /// Automatic capture is only offered then, because a UAC prompt in the middle of a match is not acceptable.
+    /// </summary>
+    public static bool CanTraceWithoutElevation()
+    {
+        try
+        {
+            using var id = System.Security.Principal.WindowsIdentity.GetCurrent();
+            var p = new System.Security.Principal.WindowsPrincipal(id);
+            return p.IsInRole(new System.Security.Principal.SecurityIdentifier("S-1-5-32-559")) ||
+                   p.IsInRole(System.Security.Principal.WindowsBuiltInRole.Administrator);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
     public bool IsCapturing => _cts is not null;
 
     public string? PresentMonPath => PresentMonLocator.Locate(_app.Settings.PresentMonPath);
 
     public void RequestStop() => _cts?.Cancel();
 
-    public async Task<CaptureResult> CaptureAsync(GameId game, int seconds, RunGroup group, string? note, SystemSnapshot? snapshot)
+    public async Task<CaptureResult> CaptureAsync(GameId game, int seconds, RunGroup group, string? note, SystemSnapshot? snapshot, bool elevated = true)
     {
         if (_app.IsDesignPreview || _app.Settings.DemoMode)
             return new(null, CaptureStatus.NoData, Localization.Loc.T("Capture_DemoBlocked"));
@@ -58,6 +82,7 @@ public sealed class CaptureService
         _runner = new PresentMonRunner(exe);
         lock (_markers) _markers.Clear();
         var sampler = new SensorSampler(GameCatalog.ProcessName(game), VramBudget(snapshot));
+        _sampler = sampler;
         sampler.Start();
         _cts = new CancellationTokenSource();
         CaptureOutcome outcome;
@@ -65,13 +90,14 @@ public sealed class CaptureService
         try
         {
             outcome = await _runner.CaptureAsync(
-                new CaptureRequest(GameCatalog.ProcessName(game), seconds, csv, _app.Settings.ElevatedCapture), _cts.Token);
+                new CaptureRequest(GameCatalog.ProcessName(game), seconds, csv, elevated && _app.Settings.ElevatedCapture), _cts.Token);
         }
         finally
         {
             _cts.Dispose();
             _cts = null;
             raw = await sampler.StopAsync();
+            _sampler = null;
         }
         var cpuLoad = cpu.Sample();
         long[] markers;

@@ -15,6 +15,14 @@ public static class GameCatalog
     public static string ExeName(GameId game) => ProcessName(game) + ".exe";
     public static string DisplayName(GameId game) => game == GameId.Cs2 ? "Counter-Strike 2" : "VALORANT";
 
+    /// <summary>Process id of the running game, or null. Only lists processes; never opens or touches the game.</summary>
+    public static int? ProcessId(GameId game)
+    {
+        var procs = Process.GetProcessesByName(ProcessName(game));
+        try { return procs.Length == 0 ? null : procs[0].Id; }
+        finally { foreach (var p in procs) p.Dispose(); }
+    }
+
     public static bool IsRunning(GameId game)
     {
         var procs = Process.GetProcessesByName(ProcessName(game));

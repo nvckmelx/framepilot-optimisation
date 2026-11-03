@@ -31,6 +31,35 @@
             </StackPanel>
         </Border>
 
+        <!-- 1.1: lag marker and automatic capture -->
+        <Border Style="{StaticResource Card}">
+            <StackPanel>
+                <TextBlock Style="{StaticResource H2}" Text="{l:T Set_MarkerTitle}" Margin="0,0,0,6" />
+                <TextBlock Style="{StaticResource Body}" Text="{l:T Set_MarkerBody}" Margin="0,0,0,10" />
+                <CheckBox IsChecked="{Binding MarkerSound, Mode=TwoWay}" Content="{l:T Set_MarkerSound}" />
+                <TextBlock Style="{StaticResource MutedText}" Margin="30,4,0,0" Foreground="{StaticResource Warn}" Text="{l:T Set_MarkerBusy}"
+                           Visibility="{Binding MarkerHotkeyBusy, Converter={StaticResource BoolVis}}" />
+
+                <TextBlock Style="{StaticResource H2}" Text="{l:T Set_AutoTitle}" Margin="0,22,0,6" />
+                <CheckBox IsChecked="{Binding AutoCapture, Mode=TwoWay}" Content="{l:T Set_AutoCapture}" IsEnabled="{Binding CanAutoCapture}" />
+                <TextBlock Style="{StaticResource MutedText}" Margin="30,4,0,0" Text="{Binding AutoCaptureHint}" />
+                <StackPanel Orientation="Horizontal" Margin="30,10,0,0">
+                    <TextBlock Style="{StaticResource Body}" Text="{l:T Set_AutoDelay}" VerticalAlignment="Center" Margin="0,0,10,0" />
+                    <ItemsControl ItemsSource="{Binding AutoDelayItems}" IsEnabled="{Binding CanAutoCapture}">
+                        <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <RadioButton Style="{StaticResource Segment}" GroupName="autodelay" Content="{Binding Label}"
+                                             IsChecked="{Binding Selected, Mode=OneWay}"
+                                             Command="{Binding DataContext.SetAutoDelayCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                             CommandParameter="{Binding Seconds}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
         <Border Style="{StaticResource Card}">
             <StackPanel>
                 <TextBlock Style="{StaticResource H2}" Text="{l:T Set_License}" Margin="0,0,0,6" />
