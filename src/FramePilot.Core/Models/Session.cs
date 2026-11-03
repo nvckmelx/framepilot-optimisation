@@ -10,7 +10,8 @@ public sealed record FrameSample(
     double? PcLatencyMs,
     double? ClickToPhotonMs,
     string? PresentMode,
-    bool Displayed);
+    bool Displayed,
+    double? DisplayLatencyMs = null);
 
 public enum RunGroup
 {
@@ -63,4 +64,6 @@ public sealed record SessionRecord(
     FrameStats Stats,
     string? CsvPath,
     bool IsDemo,
-    IReadOnlyList<string> Warnings);
+    IReadOnlyList<string> Warnings,
+    string? SensorsCsvPath = null,
+    SessionInsights? Insights = null);

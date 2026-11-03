@@ -10,7 +10,8 @@ public sealed record ParsedCapture(
     int RowsRead,
     int RowsSkipped,
     string? SwapChain,
-    IReadOnlyList<string> Warnings);
+    IReadOnlyList<string> Warnings,
+    long? FirstFrameQpc = null);
 
 /// <summary>
 /// Parses PresentMon CSV output. Column names differ between PresentMon versions and metric modes, so columns are
@@ -24,6 +25,9 @@ public static class PresentMonCsv
     private static readonly string[] CpuBusyColumns = { "MsCPUBusy", "CPUBusy" };
     private static readonly string[] PcLatencyColumns = { "MsPCLatency", "PCLatency" };
     private static readonly string[] ClickColumns = { "MsClickToPhotonLatency", "ClickToPhotonLatency" };
+    private static readonly string[] DisplayLatencyColumns = { "DisplayLatency", "MsDisplayLatency" };
+    /// <summary>Raw QPC start time of each present (PresentMon 2 with --qpc_time). Used to align system sensors with frames.</summary>
+    private static readonly string[] QpcColumns = { "CPUStartQPC", "QPCTime" };
 
     public static ParsedCapture Parse(TextReader reader, string? processFilter = null)
     {
@@ -49,12 +53,14 @@ public static class PresentMonCsv
         var cpu = Col(CpuBusyColumns);
         var pcl = Col(PcLatencyColumns);
         var c2p = Col(ClickColumns);
+        var dlat = Col(DisplayLatencyColumns);
+        var qpc = Col(QpcColumns);
         var mode = Col("PresentMode");
         var displayed = Col("DisplayedTime");
         var dropped = Col("Dropped");
         var betweenDisplay = Col("MsBetweenDisplayChange");
 
-        var rows = new List<(string Swap, FrameSample Sample)>();
+        var rows = new List<(string Swap, FrameSample Sample, long? Qpc)>();
         int read = 0, skipped = 0;
         string? line;
         while ((line = reader.ReadLine()) is not null)
@@ -82,7 +88,8 @@ public static class PresentMonCsv
 
             rows.Add((swap >= 0 && swap < f.Count ? f[swap] : "",
                 new FrameSample(0, frameTime.Value, Num(f, gpu), Num(f, cpu), Num(f, displayed), Num(f, pcl), Num(f, c2p),
-                    mode >= 0 && mode < f.Count ? f[mode].Trim() : null, isDisplayed)));
+                    mode >= 0 && mode < f.Count ? f[mode].Trim() : null, isDisplayed, Num(f, dlat)),
+                Qpc(f, qpc)));
         }
 
         if (rows.Count == 0) throw new InvalidDataException("The capture contains no frames for the selected process.");
@@ -95,14 +102,22 @@ public static class PresentMonCsv
 
         double t = 0;
         var frames = new List<FrameSample>(main.Count());
-        foreach (var (_, s) in main)
+        foreach (var (_, s, _) in main)
         {
             t += s.FrameTimeMs;
             frames.Add(s with { TimeMs = t });
         }
         if (skipped > 0) warnings.Add($"{skipped} rows were skipped (other processes, truncated or non-numeric rows).");
 
-        return new ParsedCapture(frames, ftName, header, read, skipped, main.Key, warnings);
+        // QPC of the first analysed frame's present start; frame i ends at roughly firstQpc + TimeMs.
+        var firstQpc = main.Select(r => r.Qpc).FirstOrDefault(q => q is not null);
+        return new ParsedCapture(frames, ftName, header, read, skipped, main.Key, warnings, firstQpc);
+    }
+
+    private static long? Qpc(IReadOnlyList<string> f, int i)
+    {
+        if (i < 0 || i >= f.Count) return null;
+        return long.TryParse(f[i].Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var v) && v > 0 ? v : null;
     }
 
     private static double? Num(IReadOnlyList<string> f, int i)

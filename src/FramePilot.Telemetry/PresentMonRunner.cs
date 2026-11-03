@@ -76,7 +76,8 @@ public sealed class PresentMonRunner
             "--terminate_on_proc_exit",
             "--stop_existing_session",
             "--session_name", SessionName,
-            "--no_console_stats"
+            "--no_console_stats",
+            "--qpc_time"
         };
     }
 
