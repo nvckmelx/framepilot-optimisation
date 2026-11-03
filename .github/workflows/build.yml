@@ -69,4 +69,5 @@ jobs:
           files: |
             artifacts/TuneFPS-Setup-x64.exe
             artifacts/FramePilot-Setup-x64.exe
+          body_path: docs/releases/${{ inputs.release_tag || github.ref_name }}.md
           generate_release_notes: true
